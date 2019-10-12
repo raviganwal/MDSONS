@@ -2,38 +2,38 @@ import "package:flutter/material.dart";
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:mdsons/TotalAddCartList/TotalAddCartList.dart';
+import 'package:mdsons/CategoryScreen/CategoryScreenList.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mdsons/HomeScreen/HomePage.dart';
-import 'package:mdsons/CategoryScreen/SubCategoryList.dart';
-import 'package:mdsons/CategoryScreen/CategoryModel.dart';
+import 'package:mdsons/TotalAddCartList/TotalCartModel.dart';
 import 'package:mdsons/ProductScreen/Product.dart';
 import 'package:mdsons/ProfileDetails/Profile.dart';
 import 'package:mdsons/SplashScreen/Splash.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mdsons/Preferences/Preferences.dart';
-//-------------------------------------------------------------------------------------------//
-class Palette {
-  static Color greenLandLight = Color(0xFF6B0129);
-}
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+//---------------------------------------------------------------------------------------------------//
 class Palette1 {
   static Color greenLandLight1 = Color(0xFF222B78);
 }
 class Palette2 {
   static Color greenLandLight2 = Color(0xFFE0318C);
 }
-//-------------------------------------------------------------------------------------------//
-class CategoryScreenList extends StatefulWidget {
-  static String tag = 'CategoryScreenList';
+//---------------------------------------------------------------------------------------------------//
+class TotalAddCartList extends StatefulWidget {
+
+  static String tag = 'TotalAddCartList';
   final String value;
-//-------------------------------------------------------------------------------------------//
-  CategoryScreenList({Key key, this.value}) : super(key: key);
+  final String value4;
+//---------------------------------------------------------------------------------------------------//
+  TotalAddCartList({Key key, this.value, this.value4}) : super(key: key);
   @override
-  _NextPage createState() => new _NextPage();
+  _TotalAddCartList createState() => new _TotalAddCartList();
 }
-//-------------------------------------------------------------------------------------------//
-class _NextPage extends State<CategoryScreenList> {
+//---------------------------------------------------------------------------------------------------//
+class _TotalAddCartList extends State<TotalAddCartList> {
   List data;
+  List data1;
   String categoryid;
   List<Posts> _list = [];
   List<Posts> _search = [];
@@ -44,21 +44,24 @@ class _NextPage extends State<CategoryScreenList> {
   String CountProduct = '';
   String Userid = '';
   String ReciveCount = '';
+  String imageurl = 'https://gravitinfosystems.com/MDNS/uploads/';
   final String phone = 'tel:+917000624695';
-//-------------------------------------------------------------------------------------------//
+//---------------------------------------------------------------------------------------------------//
   // ignore: missing_return
   Future<Null> fetchData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     UserName = prefs.getString(Preferences.KEY_NAME).toString();
     UserEmail = prefs.getString(Preferences.KEY_Email).toString();
     UserContact = prefs.getString(Preferences.KEY_Contact).toString();
-   // CountProduct = prefs.getString(Preferences.KEY_CountProduct).toString();
+    // CountProduct = prefs.getString(Preferences.KEY_CountProduct).toString();
     setState(() {
       loading = true;
     });
     _list.clear();
+    String Url ='http://gravitinfosystems.com/MDNS/MDN_APP/CartProduct.php?id='+widget.value.toString();
+    //print("CartProductListUrl"+Url);;
     final response =
-    await http.get("http://gravitinfosystems.com/MDNS/MDN_APP/Category.php");
+    await http.get(Url);
     if (response.statusCode == 200) {
       final extractdata = jsonDecode(response.body);
       data = extractdata["data"];
@@ -71,17 +74,18 @@ class _NextPage extends State<CategoryScreenList> {
       });
     }
   }
-//-------------------------------------------------------------------------------------------//
+//---------------------------------------------------------------------------------------------------//
   getProductCount() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Userid = prefs.getString(Preferences.KEY_ID).toString();
     //print("Userid"+Userid);
     String GetCount =
         'http://gravitinfosystems.com/MDNS/MDN_APP/forcount.php?UserId='+Userid;
+    //print("GetCount " + GetCount);
     var res =
     await http.get(GetCount, headers: {"Accept": "application/json"});
     var dataLogin = json.decode(res.body);
-    //print("ReciveData"+dataLogin.toString());
+    // print("ReciveData"+dataLogin.toString());
     ReciveCount = dataLogin["count"].toString();
     // print("GetCountFromServer"+ReciveCount);
     setState(() {
@@ -89,17 +93,17 @@ class _NextPage extends State<CategoryScreenList> {
       //print("GetCountFromServer"+Userid);
     });
   }
-//-------------------------------------------------------------------------------------------//
+//---------------------------------------------------------------------------------------------------//
   @override
   void initState() {
     this.getProductCount();
     this.fetchData();
   }
-//-------------------------------------------------------------------------------------------//
+//---------------------------------------------------------------------------------------------------//
   Future<Null> BackScreen() async {
     Navigator.of(context).pushNamed(HomePage.tag);
   }
-//---------------------------------------------------------------------------------------------------//
+//----------------------------------------------------------------------------------------//
   _callPhone() async {
     if (await canLaunch(phone)) {
       await launch(phone);
@@ -107,10 +111,10 @@ class _NextPage extends State<CategoryScreenList> {
       throw 'Could not Call Phone';
     }
   }
-//-------------------------------------------------------------------------------------------//
+//---------------------------------------------------------------------------------------------------//
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   int _id;
-//-------------------------------------------------------------------------------------------//
+//---------------------------------------------------------------------------------------------------//
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -124,83 +128,134 @@ class _NextPage extends State<CategoryScreenList> {
           loading
               ? Center(
             child: CircularProgressIndicator(),
-          )
+            )
               : Expanded(
-            child: ListView.builder(
-
+            child: ListView.separated(
               padding: const EdgeInsets.all(4.0),
               //crossAxisSpacing: 10,
               itemCount: _list.length,
+              separatorBuilder: (context, index) =>
+                  Divider(height: 1.0, color: Colors.grey),
               itemBuilder: (context, i) {
                 categoryid = data[i]["categoryid"];
                 final a = _list[i];
                 return new Container(
+                  color: Colors.white54,
                   child: new GestureDetector(
-                    onTap: () {
+                    /*onTap: () {
                       setState(() {
                         _id = int.parse(data[i][
-                        "categoryid"]); //if you want to assign the index somewhere to check
-                       // print("categoryid"+_id.toString());
+                                        "categoryid"]); //if you want to assign the index somewhere to check
+                        //print("categoryid"+_id.toString());
                       });
                       var route = new MaterialPageRoute(
                         builder: (BuildContext context) =>
                         new SubCategoryList(
                             value: _id.toString(),
                             value1: " ${ widget.value }"),
-                      );
+                        );
                       Navigator.of(context).push(route);
-                    },
-                    child: new Card(
-                      color: Colors.white,
-                      child: new Column(
+                    },*/
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
                         children: <Widget>[
-                          new ListTile(
-                            leading: Image.asset(
-                              'assets/images/AllCategory.png',
-                              height: 250.0,
-                              width: 50.0,
+                          Container(
+                            height: 100,
+                            width: 80,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: NetworkImage(imageurl+a.image),
+                                fit: BoxFit.cover,
+                                ),
+                              borderRadius: BorderRadius.all(Radius.circular(5)),
+                              ),
                             ),
-
-                            title: new Text(
-                              a.title.toUpperCase(),textAlign: TextAlign.start,
-                              style: new TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold,color: Palette.greenLandLight),
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(
+                                    a.productname,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                        color: Palette2.greenLandLight2
+                                        ),
+                                    ),
+                                  SizedBox(
+                                    height: 10,
+                                    ),
+                                  Text(
+                                    "Total Count ${a.count}",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                        color: Colors.grey
+                                        ),
+                                    ),
+                                  SizedBox(
+                                    // height: 10,
+                                    ),
+                                  Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: Text(
+                                          "SellingPrice ${a.SellingPrice}",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 14,
+                                              color: Colors.grey
+                                              ),
+                                          ),
+                                        ),
+                                      Icon(
+                                        FontAwesomeIcons.rupeeSign,
+                                        size: 18,
+                                        color: Palette2.greenLandLight2,
+                                        ),
+                                      new Text(a.mrp, style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 18,
+                                          color: Palette2.greenLandLight2
+                                          ),
+                                               ),
+                                    ],
+                                    )
+                                ],
+                                ),
+                              ),
                             ),
-                            trailing: Icon(Icons.keyboard_arrow_right,color: Palette.greenLandLight,),
-                            /*subtitle: new Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              new Text('categoryid: '+categoryid,
-                                  style: new TextStyle(
-                                      fontSize: 13.0, fontWeight: FontWeight.normal,color: Palette.greenLandLight)),
-                            ]),*/
-                          )
                         ],
+                        ),
                       ),
                     ),
-                  ),
 
-                );
+                  );
               },
+              ),
             ),
-          ),
         ],
-      ),
-    );
-//-------------------------------------------------------------------------------------------//
+        ),
+      );
+//---------------------------------------------------------------------------------------------------//
     return new WillPopScope(
-        onWillPop: BackScreen,
-    child: Scaffold(
-      drawer: _drawer(),
+      onWillPop: BackScreen,
+      child: Scaffold(
+        drawer: _drawer(),
         key: _scaffoldKey,
         appBar: AppBar(
           title: new Padding(
             padding: const EdgeInsets.all(10.0),
             child: new Container(
               color: Colors.transparent,
-              child: Text('Category'.toUpperCase()),
+              child: Text('add item List'.toUpperCase()),
+              ),
             ),
-          ),
           centerTitle: true,
           actions: <Widget>[
             new Stack(
@@ -210,18 +265,9 @@ class _NextPage extends State<CategoryScreenList> {
                   icon: new Icon(
                     Icons.shopping_cart,
                     color: Colors.white,
+                    ),
+                  onPressed: null,
                   ),
-                  onPressed: () {
-                    //print("hello"+id.toString());
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => TotalAddCartList(
-                            value: Userid.toString(),
-                            )),
-                      );
-                  },
-                ),
                 new Positioned(
                     child: new Stack(
                       children: <Widget>[
@@ -236,19 +282,66 @@ class _NextPage extends State<CategoryScreenList> {
                                     color: Colors.white,
                                     fontSize: 12.0,
                                     fontWeight: FontWeight.w500),
-                              ),
-                            )),
+                                ),
+                              )),
                       ],
-                    )),
+                      )),
               ],
-            ),
+              ),
+
           ],
-        ),
+          ),
         backgroundColor: Colors.white,
-        body: listJson,),
-    );
+        body: listJson,
+        bottomNavigationBar: BottomAppBar(
+          child: new Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Expanded(
+                child: Container(
+                  height: 50,
+                  color:Color(0xFF222B78),
+                  child: new FlatButton.icon(
+                    //color: Colors.red,
+                    icon: Icon(FontAwesomeIcons.sortNumericDown,color: Colors.white,), //`Icon` to display
+                      label: Text(ReciveCount.toString(),textAlign: TextAlign.left,style: TextStyle(fontSize: 15.0, color: Colors.white,fontWeight: FontWeight.bold,)), //`Text` to display
+                    /*onPressed: () {
+                        Navigator
+                            .of(context)
+                            .push(new MaterialPageRoute(builder: (_) => new Product()));
+                      },*/
+                    ),
+
+                  ),
+                flex: 2,
+                ),
+              Expanded(
+                child: Container(
+                  height: 50,
+                  color:Color(0xFFE0318C),
+                  child: new FlatButton.icon(
+                    //color: Colors.red,
+                    icon: Icon( FontAwesomeIcons.rupeeSign,
+                                  size: 18,
+                                  color: Colors.white,), //`Icon` to display
+                      label: Text('5380'.toUpperCase(),style: TextStyle(fontSize: 15.0, color: Colors.white,fontWeight: FontWeight.bold,)), //`Text` to display
+                    /*onPressed: () {
+                        GetCountRequest(); //fun1
+                        _ackAlert(); //fun2
+                      },*/
+                    ),
+
+                  ),
+                flex: 3,
+                ),
+            ],
+            ),
+          ),),
+      );
   }
-//-------------------------------------------------------------------------------------------//
+//---------------------------------------------------------------------------------------------------//
   Widget _drawer() {
     return new Drawer(
         elevation: 20.0,
@@ -273,113 +366,113 @@ class _NextPage extends State<CategoryScreenList> {
                 backgroundImage: ExactAssetImage('assets/images/aa.jpg'),
                 minRadius: 90,
                 maxRadius: 100,
-              ),
+                ),
               decoration: BoxDecoration(color: Palette2.greenLandLight2),
-            ),
+              ),
             ListTile(
               leading: new Image.asset(
                 'assets/images/home.png',
                 width: 20.0,
                 height: 20.0,
                 fit: BoxFit.cover,
-              ),
+                ),
               title: Text("Home".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
               onTap: () {
                 Navigator.of(context).pushNamed(HomePage.tag);
               },
-            ),
+              ),
             Divider(
               height: 2.0,
-            ),
+              ),
             ListTile(
               leading: new Image.asset(
                 'assets/images/profile.png',
                 width: 20.0,
                 height: 20.0,
                 fit: BoxFit.cover,
-              ),
+                ),
               title: Text("Profile".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
               onTap: () {
                 Navigator.of(context).pushNamed(Profile.tag);
               },
-            ),
+              ),
             Divider(
               height: 2.0,
-            ),
+              ),
             ListTile(
               leading: new Image.asset(
                 'assets/images/Product.png',
                 width: 20.0,
                 height: 20.0,
                 fit: BoxFit.cover,
-              ),
+                ),
               title: Text("Products".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
               onTap: () {
                 Navigator.of(context).pushNamed(Product.tag);
               },
-            ),
+              ),
             Divider(
               height: 2.0,
-            ),
+              ),
             ListTile(
               leading: new Image.asset(
                 'assets/images/cate.png',
                 width: 20.0,
                 height: 20.0,
                 fit: BoxFit.cover,
-              ),
+                ),
               title: Text("categories".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
               onTap: () {
                 Navigator.of(context).pushNamed(CategoryScreenList.tag);
               },
-            ),
+              ),
             Divider(
               height: 2.0,
-            ),
+              ),
             ListTile(
               leading: new Image.asset(
                 'assets/images/contactus.png',
                 width: 20.0,
                 height: 20.0,
                 fit: BoxFit.cover,
-              ),
+                ),
               title: Text("MyOrder".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
               onTap: () {
-                // Navigator.of(context).pushNamed(CategoryScreenList.tag);
+                //Navigator.of(context).pushNamed(CartProductList.tag);
               },
-            ),
+              ),
             Divider(
               height: 2.0,
-            ),
+              ),
             ListTile(
               leading: new Image.asset(
                 'assets/images/helpdesk.png',
                 width: 20.0,
                 height: 20.0,
                 fit: BoxFit.cover,
-              ),
+                ),
               title: Text("Help".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
               onTap: () => _callPhone(),
-            ),
+              ),
             Divider(
               height: 2.0,
-            ),
+              ),
             ListTile(
               leading: new Image.asset(
                 'assets/images/exit.png',
                 width: 20.0,
                 height: 20.0,
                 fit: BoxFit.cover,
-              ),
+                ),
               title: Text("Logout".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
               onTap: () {
                 TapMessage(context, "Logout!");
               },
-            ),
+              ),
           ],
-        ));
+          ));
   }
-//-------------------------------------------------------------------------------------------//
+//---------------------------------------------------------------------------------------------------//
   void TapMessage(BuildContext context, String message) {
     var alert = new AlertDialog(
       title: new Text('Want to logout?'),
@@ -391,10 +484,10 @@ class _NextPage extends State<CategoryScreenList> {
             },
             child: new Text('OK'))
       ],
-    );
+      );
     showDialog(context: context, child: alert);
   }
-//-------------------------------------------------------------------------------------------//
+//---------------------------------------------------------------------------------------------------//
   removeData() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.remove(Preferences.KEY_ID);
@@ -405,4 +498,4 @@ class _NextPage extends State<CategoryScreenList> {
     Navigator.of(context).pushNamed(Splash.tag);
   }
 }
-//-------------------------------------------------------------------------------------------//
+//---------------------------------------------------------------------------------------------------//

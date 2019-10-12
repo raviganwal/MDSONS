@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mdsons/CategoryScreen/CategoryScreenList.dart';
-import 'package:mdsons/CategoryScreen/ProductGridViewDetails.dart';
+import 'package:mdsons/CategoryScreen/CategoryProductGridViewDetails.dart';
 import 'package:mdsons/CategoryScreen/ProductListGridView.dart';
 import 'package:mdsons/CategoryScreen/SubCategoryList.dart';
-import 'package:mdsons/HelpScreen/Help.dart';
 import 'package:mdsons/HomeScreen/HomePage.dart';
 import 'package:mdsons/HomeScreen/HomeProductDetails.dart';
 import 'package:mdsons/LoginScreen/Login.dart';
@@ -11,6 +10,7 @@ import 'package:mdsons/ProductScreen/DetailsOrAddToCart.dart';
 import 'package:mdsons/ProductScreen/Product.dart';
 import 'package:mdsons/ProfileDetails/Profile.dart';
 import 'package:mdsons/SplashScreen/Splash.dart';
+import 'package:mdsons/TotalAddCartList/TotalAddCartList.dart';
 
 final routes = {
   '/Splash': (BuildContext context) => new Splash(),
@@ -26,5 +26,5 @@ final routes = {
   DetailsOrAddToCart.tag: (context) => DetailsOrAddToCart(),
   HomeProductDetails.tag: (context) => HomeProductDetails(),
   ProductGridViewDetails.tag: (context) => ProductGridViewDetails(),
-  Help.tag: (context) => Help()
+  TotalAddCartList.tag: (context) => TotalAddCartList()
 };

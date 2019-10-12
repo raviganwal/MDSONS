@@ -1,43 +1,38 @@
 import 'package:mdsons/CategoryScreen/CategoryScreenList.dart';
-import 'package:mdsons/CategoryScreen/ProductListGridView.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mdsons/HomeScreen/HomePage.dart';
-import 'package:mdsons/ProductScreen/model.dart';
+import 'package:mdsons/ProductScreen/Model.dart';
 import 'package:mdsons/ProductScreen/Product.dart';
 import 'package:mdsons/ProfileDetails/Profile.dart';
 import 'package:mdsons/SplashScreen/Splash.dart';
+import 'package:mdsons/TotalAddCartList/TotalAddCartList.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mdsons/Preferences/Preferences.dart';
-
+import 'package:url_launcher/url_launcher.dart';
+//---------------------------------------------------------------------------------------------------//
 class Palette {
   static Color greenLandLight = Color(0xFFE0318C);
 }
 class Palette1 {
   static Color greenLandLight1 = Color(0xFF222B78);
 }
-
+//---------------------------------------------------------------------------------------------------//
 class HomeProductDetails extends StatefulWidget {
   static String tag = 'HomeProductDetails';
-
   final String value;
   final String value1;
   final String value2;
-
-  // Teacher_TimetableBYDay(this.value1);
-
   HomeProductDetails({Key key, this.value, this.value1,this.value2}) : super(key: key);
-
   @override
   _MonthSelection createState() => new _MonthSelection();
 }
-
+//---------------------------------------------------------------------------------------------------//
 class _MonthSelection extends State<HomeProductDetails> {
 
   String imageurl = 'https://gravitinfosystems.com/MDNS/uploads/';
-
   List data;
   List<Posts> _list = [];
   List<Posts> _search = [];
@@ -54,7 +49,8 @@ class _MonthSelection extends State<HomeProductDetails> {
   String UserName = '';
   String UserEmail = '';
   String UserContact = '';
-
+  final String phone = 'tel:+917000624695';
+//---------------------------------------------------------------------------------------------------//
   // ignore: missing_return
   Future<Null> makeRequest() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -62,7 +58,6 @@ class _MonthSelection extends State<HomeProductDetails> {
     UserEmail = prefs.getString(Preferences.KEY_Email).toString();
     UserContact = prefs.getString(Preferences.KEY_Contact).toString();
     id = prefs.getString(Preferences.KEY_ID).toString();
-
     setState(() {
       loading = true;
     });
@@ -72,111 +67,115 @@ class _MonthSelection extends State<HomeProductDetails> {
     if (response.statusCode == 200) {
       var extractdata = jsonDecode(response.body);
       data = extractdata["data"];
-
-
-
-      /*var name = extractdata['product_name'];
-      print('$name is $name');*/
-
-
-      print(data.toString());
+     // print(data.toString());
       setState(() {
         for (Map i in data) {
           _list.add(Posts.formJson(i));
           loading = false;
-
         }
       });
-
     }
   }
-
+//---------------------------------------------------------------------------------------------------//
   // ignore: missing_return
   Future<String> GetCountRequest() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    //RecivedCount = prefs.getString(Preferences.KEY_CountProduct).toString();
     id = prefs.getString(Preferences.KEY_ID).toString();
     String url = 'http://gravitinfosystems.com/MDNS/MDN_APP/Cart.php?UserId='+id+'&ProductId='+StoreProductId;
     //print("url"+url);
     var response = await http
         .get(Uri.encodeFull(url), headers: {"Accept": "application/json"});
-
     setState(() {
       var extractdata = json.decode(response.body);
       NumberOfCount = extractdata.toString();
       //print("recivedata"+NumberOfCount);
 
       RecivedCount = extractdata["count"].toString();
-      print("count"+RecivedCount);
-
+      //print("count"+RecivedCount);
       //RecivedMessage = extractdata["count"][2].toString();
       //print("RecivedMessage"+RecivedMessage);
     });
   }
-
+//---------------------------------------------------------------------------------------------------//
   getProductCount() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Userid = prefs.getString(Preferences.KEY_ID).toString();
-    print("Userid"+Userid);
+    //print("Userid"+Userid);
     String GetCount =
         'http://gravitinfosystems.com/MDNS/MDN_APP/forcount.php?UserId='+Userid;
-
     //print("GetCount " + GetCount);
-
     var res =
     await http.get(GetCount, headers: {"Accept": "application/json"});
-
     var dataLogin = json.decode(res.body);
     // print("ReciveData"+dataLogin.toString());
-
     ReciveCount = dataLogin["count"].toString();
     // print("GetCountFromServer"+ReciveCount);
-
     setState(() {
       //print("Success");
       //print("GetCountFromServer"+Userid);
     });
-
   }
-
-  Future<void> _ackAlert(BuildContext context) {
+//---------------------------------------------------------------------------------------------------//
+  Future<void> _ackAlert() async {
     return showDialog<void>(
       context: context,
+      barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Congratulation'),
-          content:  Text("Product Add Successfully Thanks.."),
+          title: Text('Product Add Message',textAlign: TextAlign.center,style: new TextStyle(fontSize: 15.0, color: Palette.greenLandLight,fontWeight: FontWeight.bold),),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Product Add Successfully Thanks..',textAlign: TextAlign.center,style: new TextStyle(fontSize: 12.0, color: Palette1.greenLandLight1,fontWeight: FontWeight.bold),),
+              ],
+              ),
+            ),
           actions: <Widget>[
             FlatButton(
-              child: Text('Ok'),
               onPressed: () {
-                Navigator.of(context).pushNamed(HomePage.tag);
+                //("hello123"+id.toString());
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => TotalAddCartList(
+                        value: id.toString(),
+                        )),
+                  );
               },
-            ),
+              child: Text('OK',style: new TextStyle(fontSize: 15.0, color: Palette.greenLandLight,fontWeight: FontWeight.bold),),
+              )
           ],
-        );
+          );
       },
-    );
+      );
   }
+//---------------------------------------------------------------------------------------------------//
+  _callPhone() async {
+    if (await canLaunch(phone)) {
+      await launch(phone);
+    } else {
+      throw 'Could not Call Phone';
+    }
+  }
+//---------------------------------------------------------------------------------------------------//
   Future<Null> BackScreen() async {
     Navigator.of(context).pushNamed(HomePage.tag);
   }
+//---------------------------------------------------------------------------------------------------//
   @override
   void initState() {
     this.makeRequest();
     this.getProductCount();
-
   }
-
+//---------------------------------------------------------------------------------------------------//
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-
+//---------------------------------------------------------------------------------------------------//
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double _width = width * 0.70;
     double height = MediaQuery.of(context).size.height;
     double _height = height * 0.85;
-
     final listJson = new Container(
       child: Column(
         children: <Widget>[
@@ -237,12 +236,12 @@ class _MonthSelection extends State<HomeProductDetails> {
                                                 new Text(
                                                   /*"${widget.itemRating}",*/
                                                   a.categoryname.toUpperCase(),
-                                                  style: new TextStyle(fontSize: 13.0, color: Colors.black,fontWeight: FontWeight.bold),
+                                                  style: new TextStyle(fontSize: 12.0, color: Colors.black,fontWeight: FontWeight.bold),
                                                 ),
                                                 new Text(
                                                   /*"${widget.itemRating}",*/
                                                   " > "+a.subcategoryname.toUpperCase(),
-                                                  style: new TextStyle(fontSize: 13.0, color: Colors.black,fontWeight: FontWeight.bold),
+                                                  style: new TextStyle(fontSize: 12.0, color: Colors.black,fontWeight: FontWeight.bold),
                                                 ),
 
                                               ],
@@ -349,7 +348,7 @@ class _MonthSelection extends State<HomeProductDetails> {
                                             new SizedBox(
                                               //height: 1.0,
                                             ),
-                                            new Text(a.description.toUpperCase(),
+                                            new Text(a.description,
                                                 style: new TextStyle(
                                                     fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w300)),
                                             /* new Text('Price: ${data["Price"]}',
@@ -380,7 +379,7 @@ class _MonthSelection extends State<HomeProductDetails> {
                                             new SizedBox(
                                               height: 1.0,
                                             ),
-                                            new Text(a.howtouse.toUpperCase(),
+                                            new Text(a.howtouse,
                                                 style: new TextStyle(
                                                     fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w300)),
                                             /* new Text('Price: ${data["Price"]}',
@@ -406,6 +405,7 @@ class _MonthSelection extends State<HomeProductDetails> {
         ],
       ),
     );
+//---------------------------------------------------------------------------------------------------//
     return new WillPopScope(
         onWillPop: BackScreen,
     child: Scaffold(
@@ -431,7 +431,16 @@ class _MonthSelection extends State<HomeProductDetails> {
                   Icons.shopping_cart,
                   color: Colors.white,
                 ),
-                onPressed: null,
+                onPressed: () {
+                  //print("hello"+id.toString());
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => TotalAddCartList(
+                          value: id.toString(),
+                          )),
+                    );
+                },
               ),
               new Positioned(
                   child: new Stack(
@@ -457,6 +466,7 @@ class _MonthSelection extends State<HomeProductDetails> {
         ],
       ),
       backgroundColor: Colors.white,
+//---------------------------------------------------------------------------------------------------//
       body: listJson,
       bottomNavigationBar: BottomAppBar(
         child: new Row(
@@ -492,7 +502,7 @@ class _MonthSelection extends State<HomeProductDetails> {
                   label: Text('add to cart'.toUpperCase(),style: TextStyle(fontSize: 15.0, color: Colors.white,fontWeight: FontWeight.bold,)), //`Text` to display
                   onPressed: () {
                     GetCountRequest(); //fun1
-                    _ackAlert(context); //fun2
+                    _ackAlert(); //fun2
                   },
                 ),
 
@@ -504,8 +514,8 @@ class _MonthSelection extends State<HomeProductDetails> {
       ),
     ),
     );
-
   }
+//---------------------------------------------------------------------------------------------------//
   Widget _drawer() {
     return new Drawer(
         elevation: 20.0,
@@ -616,9 +626,7 @@ class _MonthSelection extends State<HomeProductDetails> {
                 fit: BoxFit.cover,
               ),
               title: Text("Help".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
-              onTap: () {
-                // Navigator.of(context).pushNamed(CategoryScreenList.tag);
-              },
+              onTap: () => _callPhone(),
             ),
             Divider(
               height: 2.0,
@@ -638,6 +646,7 @@ class _MonthSelection extends State<HomeProductDetails> {
           ],
         ));
   }
+//---------------------------------------------------------------------------------------------------//
   void TapMessage(BuildContext context, String message) {
     var alert = new AlertDialog(
       title: new Text('Want to logout?'),
@@ -652,6 +661,7 @@ class _MonthSelection extends State<HomeProductDetails> {
     );
     showDialog(context: context, child: alert);
   }
+//---------------------------------------------------------------------------------------------------//
   removeData() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.remove(Preferences.KEY_ID);
@@ -662,4 +672,4 @@ class _MonthSelection extends State<HomeProductDetails> {
     Navigator.of(context).pushNamed(Splash.tag);
   }
 }
-
+//---------------------------------------------------------------------------------------------------//

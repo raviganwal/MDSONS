@@ -32,6 +32,9 @@ class _LoginState extends State<Login>
   String id = '';
   String Count_Product = '';
 
+  List<Company> _companies = Company.getCompanies();
+  List<DropdownMenuItem<Company>> _dropdownMenuItems;
+  Company _selectedCompany;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
@@ -125,13 +128,13 @@ class _LoginState extends State<Login>
       String profile =
           'http://gravitinfosystems.com/MDNS/MDN_APP/login.php?Email='+email+"&Password="+password;
 
-      print("URLLogin " + profile);
+      //print("URLLogin " + profile);
 
       var res =
       await http.get(profile, headers: {"Accept": "application/json"});
 
       var dataLogin = json.decode(res.body);
-      print("ReciveData"+dataLogin.toString());
+      //print("ReciveData"+dataLogin.toString());
 
       statuslogin = dataLogin['data']['0'.toString()];
       //print("ReciveLoginstatus"+statuslogin.toString());
@@ -165,11 +168,11 @@ class _LoginState extends State<Login>
 
       setState(() {
         //print("Success");
-        print(id);
-        print(role);
-        print(statuslogin);
-        print(msg);
-        print(name);
+       // print(id);
+       // print(role);
+      //  print(statuslogin);
+      //  print(msg);
+      //  print(name);
       });
     }
   }
@@ -344,9 +347,26 @@ class _LoginState extends State<Login>
       DeviceOrientation.portraitDown,
     ]);
     _pageController = PageController();
-
+    _dropdownMenuItems = buildDropdownMenuItems(_companies);
+    _selectedCompany = _dropdownMenuItems[0].value;
   }
-
+  List<DropdownMenuItem<Company>> buildDropdownMenuItems(List companies) {
+    List<DropdownMenuItem<Company>> items = List();
+    for (Company company in companies) {
+      items.add(
+        DropdownMenuItem(
+          value: company,
+          child: Text(company.name),
+          ),
+        );
+    }
+    return items;
+  }
+  onChangeDropdownItem(Company selectedCompany) {
+    setState(() {
+      _selectedCompany = selectedCompany;
+    });
+  }
   void showInSnackBar(String value) {
     FocusScope.of(context).requestFocus(new FocusNode());
     _scaffoldKey.currentState?.removeCurrentSnackBar();
@@ -585,12 +605,26 @@ class _LoginState extends State<Login>
                 ),
                 child: Container(
                   width: 300.0,
-                  //height: 400.0,
+                  //height: 600.0,
                   child: Column(
                     children: <Widget>[
                       Padding(
                         padding: EdgeInsets.only(
-                            top: 20.0, bottom: 20.0, left: 25.0, right: 25.0),
+                            top: 10.0, bottom: 1.0, left: 25.0, right: 25.0),
+                        child: DropdownButton(
+                          isExpanded: true,
+                          value: _selectedCompany,
+                          items: _dropdownMenuItems,
+                          onChanged: onChangeDropdownItem,
+                          style: TextStyle(
+                              fontFamily: "WorkSansSemiBold",
+                              fontSize: 16.0,
+                              color: Colors.black),
+                          ),
+                        ),
+                      Padding(
+                        padding: EdgeInsets.only(
+                            top: 10.0, bottom: 1.0, left: 25.0, right: 25.0),
                         child: TextField(
                           focusNode: myFocusNodeName,
                           controller: signupNameController,
@@ -619,7 +653,7 @@ class _LoginState extends State<Login>
                       ),
                       Padding(
                         padding: EdgeInsets.only(
-                            top: 20.0, bottom: 20.0, left: 25.0, right: 25.0),
+                            top: 10.0, bottom: 1.0, left: 25.0, right: 25.0),
                         child: TextField(
                           focusNode: myFocusNodeEmail,
                           controller: signupEmailController,
@@ -647,7 +681,7 @@ class _LoginState extends State<Login>
                       ),
                       Padding(
                         padding: EdgeInsets.only(
-                            top: 20.0, bottom: 20.0, left: 25.0, right: 25.0),
+                            top: 10.0, bottom: 1.0, left: 25.0, right: 25.0),
                         child: TextField(
                           focusNode: myFocusNodePassword,
                           controller: signupPasswordController,
@@ -685,7 +719,7 @@ class _LoginState extends State<Login>
                       ),
                       Padding(
                         padding: EdgeInsets.only(
-                            top: 20.0, bottom: 20.0, left: 25.0, right: 25.0),
+                            top: 10.0, bottom: 1.0, left: 25.0, right: 25.0),
                         child: TextField(
                           focusNode: myFocusNodePassword,
                           controller: signupPasswordController,
@@ -723,7 +757,7 @@ class _LoginState extends State<Login>
                       ),
                       Padding(
                         padding: EdgeInsets.only(
-                            top: 10.0, bottom: 20.0, left: 25.0, right: 25.0),
+                            top: 10.0, bottom: 1.0, left: 25.0, right: 25.0),
                         child: TextField(
                           maxLength: 10,
                           controller: signupMobilewController,
@@ -751,7 +785,7 @@ class _LoginState extends State<Login>
                 ),
               ),
               Container(
-                margin: EdgeInsets.only(top: 415.0),
+                margin: EdgeInsets.only(top: 350.0),
                 decoration: new BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(5.0)),
                   boxShadow: <BoxShadow>[
@@ -829,5 +863,19 @@ class _LoginState extends State<Login>
     setState(() {
       _obscureTextSignupConfirm = !_obscureTextSignupConfirm;
     });
+  }
+}
+class Company {
+  int id;
+  String name;
+
+  Company(this.id, this.name);
+
+  static List<Company> getCompanies() {
+    return <Company>[
+      Company(1, 'Select User',),
+      Company(2, 'Individual'),
+      Company(3, 'Seller'),
+    ];
   }
 }

@@ -3,10 +3,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mdsons/CategoryScreen/CategoryScreenList.dart';
-import 'package:mdsons/HelpScreen/Help.dart';
+import 'package:mdsons/TotalAddCartList/TotalAddCartList.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:mdsons/HomeScreen/HomePage.dart';
 import 'package:mdsons/ProductScreen/DetailsOrAddToCart.dart';
-import 'package:mdsons/ProductScreen/model.dart';
+import 'package:mdsons/ProductScreen/Model.dart';
 import 'package:mdsons/ProfileDetails/Profile.dart';
 import 'package:mdsons/SplashScreen/Splash.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,17 +24,16 @@ class Palette1 {
 class Product extends StatefulWidget {
   // This widget is the root of your application.
   static String tag = 'Product';
-
   final String value;
-
   Product({Key key, this.value}) : super(key: key);
 
+//---------------------------------------------------------------------------------------------------//
   @override
   _ProductState createState() => _ProductState();
 }
-
 class _ProductState extends State<Product> {
 
+//---------------------------------------------------------------------------------------------------//
   //variables
   List data;
   String fullname = "";
@@ -52,8 +52,8 @@ class _ProductState extends State<Product> {
   String Userid= '';
   String ReciveCount = " ";
   String ProductName="";
-
-
+  final String phone = 'tel:+917000624695';
+//---------------------------------------------------------------------------------------------------//
 
   onSearch(String text) async {
     _search.clear();
@@ -67,7 +67,7 @@ class _ProductState extends State<Product> {
     });
     setState(() {});
   }
-
+//---------------------------------------------------------------------------------------------------//
   Future<Null> fetchData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     UserName = prefs.getString(Preferences.KEY_NAME).toString();
@@ -83,6 +83,7 @@ class _ProductState extends State<Product> {
     if (response.statusCode == 200) {
       final extractdata = jsonDecode(response.body);
       data = extractdata["data"];
+      //print("ReciveData"+data.toString());
       setState(() {
         for (Map i in data) {
           _list.add(Posts.formJson(i));
@@ -91,59 +92,58 @@ class _ProductState extends State<Product> {
       });
     }
   }
-
+//---------------------------------------------------------------------------------------------------//
   Future<Null> BackScreen() async {
     Navigator.of(context).pushNamed(HomePage.tag);
   }
-
+//---------------------------------------------------------------------------------------------------//
   removeData() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.remove(Preferences.KEY_ID);
     prefs.remove(Preferences.KEY_ROLE);
     prefs.remove(Preferences.KEY_NAME);
     prefs.remove(Preferences.KEY_Contact);
-    //prefs.remove(Preferences.KEY_CountProduct);
     Navigator.of(context).pushNamed(Splash.tag);
   }
-
+//---------------------------------------------------------------------------------------------------//
   getProductCount() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Userid = prefs.getString(Preferences.KEY_ID).toString();
-    print("Userid"+Userid);
+    //print("Userid"+Userid);
     String GetCount =
         'http://gravitinfosystems.com/MDNS/MDN_APP/forcount.php?UserId='+Userid;
-
     //print("GetCount " + GetCount);
-
     var res =
     await http.get(GetCount, headers: {"Accept": "application/json"});
-
     var dataLogin = json.decode(res.body);
     // print("ReciveData"+dataLogin.toString());
-
     ReciveCount = dataLogin["count"].toString();
     // print("GetCountFromServer"+ReciveCount);
-
     setState(() {
       //print("Success");
       //print("GetCountFromServer"+Userid);
     });
-
   }
-
+//----------------------------------------------------------------------------------------//
+  _callPhone() async {
+    if (await canLaunch(phone)) {
+      await launch(phone);
+    } else {
+      throw 'Could not Call Phone';
+    }
+  }
+//---------------------------------------------------------------------------------------------------//
   @override
   void initState() {
     this.getProductCount();
     this.fetchData();
   }
-
-
+//---------------------------------------------------------------------------------------------------//
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   int _id;
-
+//---------------------------------------------------------------------------------------------------//
   @override
   Widget build(BuildContext context) {
-
     String imageurl = 'https://gravitinfosystems.com/MDNS/uploads/';
     double width = MediaQuery.of(context).size.width;
     double _width = width * 0.70;
@@ -163,7 +163,7 @@ class _ProductState extends State<Product> {
               onChanged: onSearch,
               decoration: InputDecoration(
                   border: InputBorder.none,
-                  hintText: "Search Product",hintStyle: TextStyle(fontSize: 15.0, color: Colors.white,fontWeight: FontWeight.w500),
+                  hintText: "Search ",hintStyle: TextStyle(fontSize: 15.0, color: Colors.white,fontWeight: FontWeight.w500),
                   filled: true,
                   prefixIcon: Icon(
                     Icons.search,color: Colors.white,
@@ -176,9 +176,7 @@ class _ProductState extends State<Product> {
                       onSearch('');
                     },)
               ),
-
             ),
-
         ),
         actions: <Widget>[
           new Stack(
@@ -189,7 +187,16 @@ class _ProductState extends State<Product> {
                   Icons.shopping_cart,
                   color: Colors.white,
                 ),
-                onPressed: null,
+                onPressed: () {
+                  //print("hello"+id.toString());
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => TotalAddCartList(
+                          value: Userid.toString(),
+                          )),
+                    );
+                },
               ),
               new Positioned(
                   child: new Stack(
@@ -211,10 +218,9 @@ class _ProductState extends State<Product> {
                   )),
             ],
           ),
-
         ],
       ),
-
+//-------------------------------------------------------------------------------------//
       body: Container(
         child: Column(
           children: <Widget>[
@@ -241,7 +247,8 @@ class _ProductState extends State<Product> {
                             "product_id"]);
                             ProductName = (data[i][
                             "product_name"]);//if you want to assign the index somewhere to check
-                            print("ProductName"+ProductName.toString());
+                           // print("ProductName"+ProductName.toString());
+                           // print("Product_id"+_id.toString());
                           });
                           var route = new MaterialPageRoute(
                             builder: (BuildContext context) =>
@@ -277,7 +284,7 @@ class _ProductState extends State<Product> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: <Widget>[
                                         Text(
-                                          b.title.toUpperCase().substring(0,4),
+                                          b.title.toUpperCase(),
                                           overflow: TextOverflow.ellipsis,
                                           maxLines: 1,
                                           style: TextStyle(
@@ -332,7 +339,6 @@ class _ProductState extends State<Product> {
 
                                           ],
                                         ),
-
                                       ],
                                     ),
                                   ),
@@ -347,8 +353,8 @@ class _ProductState extends State<Product> {
                   );
                 },
               )
+//---------------------------------------------------------------------------------------------------//
                   : GridView.builder(
-
                 padding: const EdgeInsets.all(4.0),
                 //crossAxisSpacing: 10,
                 itemCount: _list.length,
@@ -367,6 +373,7 @@ class _ProductState extends State<Product> {
                           ProductName = (data[i][
                           "product_name"]);//if you want to assign the index somewhere to check
                           //print("ProductName"+ProductName.toString());
+                          //print("Product_id"+_id.toString());
                         });
                         var route = new MaterialPageRoute(
                           builder: (BuildContext context) =>
@@ -402,7 +409,7 @@ class _ProductState extends State<Product> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: <Widget>[
                                       Text(
-                                        a.title.toUpperCase().substring(0,3),
+                                        a.title.toUpperCase(),
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
                                         style: TextStyle(
@@ -429,7 +436,6 @@ class _ProductState extends State<Product> {
                                                     " Rs."+a.body,
                                                     style: new TextStyle(fontSize: 13.0, color: Colors.black,fontWeight: FontWeight.bold),
                                                   ),
-
                                                 ],
                                               ),
                                               new Row(
@@ -449,7 +455,6 @@ class _ProductState extends State<Product> {
                                                     a.Discount,
                                                     style: new TextStyle(fontSize: 13.0, color: Colors.red,fontWeight: FontWeight.bold),
                                                   ),
-
                                                 ],
                                               ),
                                             ],
@@ -468,7 +473,6 @@ class _ProductState extends State<Product> {
                         ),
                       ),
                     ),
-
                   );
                 },
               ),
@@ -479,6 +483,7 @@ class _ProductState extends State<Product> {
     ),
     );
   }
+//---------------------------------------------------------------------------------------------------//
   Widget _drawer() {
     return new Drawer(
         elevation: 20.0,
@@ -575,7 +580,7 @@ class _ProductState extends State<Product> {
               ),
               title: Text("MyOrder".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
               onTap: () {
-                // Navigator.of(context).pushNamed(CategoryScreenList.tag);
+                 //Navigator.of(context).pushNamed(CartProductList.tag);
               },
             ),
             Divider(
@@ -589,9 +594,7 @@ class _ProductState extends State<Product> {
                 fit: BoxFit.cover,
               ),
               title: Text("Help".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
-              onTap: () {
-               Navigator.of(context).pushNamed(Help.tag);
-              },
+              onTap: () => _callPhone(),
             ),
             Divider(
               height: 2.0,
@@ -611,6 +614,7 @@ class _ProductState extends State<Product> {
           ],
         ));
   }
+//---------------------------------------------------------------------------------------------------//
   void TapMessage(BuildContext context, String message) {
     var alert = new AlertDialog(
       title: new Text('Want to logout?'),
@@ -626,3 +630,4 @@ class _ProductState extends State<Product> {
     showDialog(context: context, child: alert);
   }
 }
+//---------------------------------------------------------------------------------------------------//

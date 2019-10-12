@@ -1,32 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:mdsons/CategoryScreen/CategoryScreenList.dart';
-import 'package:mdsons/HelpScreen/Help.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:mdsons/SplashScreen/Splash.dart';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mdsons/Preferences/Preferences.dart';
 import 'package:mdsons/HomeScreen/HomePage.dart';
 import 'package:mdsons/ProductScreen/Product.dart';
-
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+//----------------------------------------------------------------------------------------//
 class Profile extends StatefulWidget {
   static String tag = 'Profile';
-
   @override
   _ProfileState createState() => new _ProfileState();
 }
-
+//----------------------------------------------------------------------------------------//
 class Palette {
   static Color greenLandLight = Color(0xFFE0318C);
 }
-
+//----------------------------------------------------------------------------------------//
 class _ProfileState extends State<Profile> {
-
-  static const String Address = '923 N GreenRose Drive Beloit,Gwalior';
+  static const String Address = '923 N GreenRose,Gwalior';
   String UserName = '';
   String UserEmail = '';
   String UserContact = '';
-  String CountProduct = '';
-
+  String ReciveCount = '';
+  String Userid = '';
+  final String phone = 'tel:+917000624695';
+//----------------------------------------------------------------------------------------//
   // ignore: missing_return
   Future<Null> fetchData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -55,6 +58,26 @@ class _ProfileState extends State<Profile> {
       });
     }*/
   }
+//---------------------------------------------------------------------------------------------------//
+  getProductCount() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Userid = prefs.getString(Preferences.KEY_ID).toString();
+    //print("Userid"+Userid);
+    String GetCount =
+        'http://gravitinfosystems.com/MDNS/MDN_APP/forcount.php?UserId='+Userid;
+    //print("GetCount " + GetCount);
+    var res =
+    await http.get(GetCount, headers: {"Accept": "application/json"});
+    var dataLogin = json.decode(res.body);
+    // print("ReciveData"+dataLogin.toString());
+    ReciveCount = dataLogin["count"].toString();
+    // print("GetCountFromServer"+ReciveCount);
+    setState(() {
+      //print("Success");
+      //print("GetCountFromServer"+Userid);
+    });
+  }
+//----------------------------------------------------------------------------------------//
   removeData() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.remove(Preferences.KEY_ID);
@@ -64,7 +87,15 @@ class _ProfileState extends State<Profile> {
     //prefs.remove(Preferences.KEY_CountProduct);
     Navigator.of(context).pushNamed(Splash.tag);
   }
-
+//----------------------------------------------------------------------------------------//
+  _callPhone() async {
+    if (await canLaunch(phone)) {
+      await launch(phone);
+    } else {
+      throw 'Could not Call Phone';
+    }
+  }
+//----------------------------------------------------------------------------------------//
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -73,7 +104,7 @@ class _ProfileState extends State<Profile> {
       padding: EdgeInsets.all(0.0),
       child: new Container(
         height: 250.0,
-        color: Palette.greenLandLight,
+        //color: Palette.greenLandLight,
         child: new Column(
           children: <Widget>[
             Padding(
@@ -104,7 +135,7 @@ class _ProfileState extends State<Profile> {
                         new Text(
                           "Mr. "+UserName.toUpperCase(),
                           style: TextStyle(
-                              fontSize: 16.0, color: Colors.white,letterSpacing: 1.4, backgroundColor: Colors.transparent,fontWeight: FontWeight.bold),
+                              fontSize: 16.0, color: Palette.greenLandLight,letterSpacing: 1.4, backgroundColor: Colors.transparent,fontWeight: FontWeight.bold),
                         ),
                       ],
                     )),
@@ -116,7 +147,7 @@ class _ProfileState extends State<Profile> {
                         new Text(
                           "+91"+UserContact,
                           style: TextStyle(
-                              fontSize: 16.0, color: Colors.white,letterSpacing: 1.4, backgroundColor: Colors.transparent,fontWeight: FontWeight.bold),
+                              fontSize: 16.0, color: Palette.greenLandLight,letterSpacing: 1.4, backgroundColor: Colors.transparent,fontWeight: FontWeight.bold),
                         ),
                       ],
                     )),
@@ -129,7 +160,7 @@ class _ProfileState extends State<Profile> {
     final AddsEmaillDob = new Padding(
         padding: EdgeInsets.all(0.0),
         child:   new Container(
-          color: Palette.greenLandLight,
+          //color: Palette.greenLandLight,
           child: Padding(
             padding: EdgeInsets.only(top:0.0),
               key: null,
@@ -146,7 +177,7 @@ class _ProfileState extends State<Profile> {
                             "Address :".toUpperCase(),
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                                fontSize: 18.0, color: Colors.white,backgroundColor: Colors.transparent,fontWeight: FontWeight.bold),
+                                fontSize: 18.0, color: Palette.greenLandLight,backgroundColor: Colors.transparent,fontWeight: FontWeight.bold),
                           ),
                           margin: new EdgeInsets.only(left: 15.0),
                         ),
@@ -155,7 +186,7 @@ class _ProfileState extends State<Profile> {
                             Address,
                             textAlign: TextAlign.start,
                             style: TextStyle(
-                                fontSize: 15.0, color: Colors.white, backgroundColor: Colors.transparent,fontWeight: FontWeight.bold),
+                                fontSize: 15.0, color: Palette.greenLandLight, backgroundColor: Colors.transparent,fontWeight: FontWeight.bold),
                           ),
                           margin: new EdgeInsets.only(left: 5.0),
                         ),
@@ -170,7 +201,7 @@ class _ProfileState extends State<Profile> {
                           "Date Of Birth :".toUpperCase(),
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                              fontSize: 18.0, color: Colors.white,backgroundColor: Colors.transparent,fontWeight: FontWeight.bold),
+                              fontSize: 18.0, color:Palette.greenLandLight,backgroundColor: Colors.transparent,fontWeight: FontWeight.bold),
                         ),
                         margin: new EdgeInsets.only(left: 15.0),
                       ),
@@ -179,7 +210,7 @@ class _ProfileState extends State<Profile> {
                           "22/06/1989",
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                              fontSize: 16.0, color: Colors.white, backgroundColor: Colors.transparent,fontWeight: FontWeight.bold),
+                              fontSize: 16.0, color: Palette.greenLandLight, backgroundColor: Colors.transparent,fontWeight: FontWeight.bold),
                         ),
                         margin: new EdgeInsets.only(left: 5.0),
                       ),
@@ -193,16 +224,16 @@ class _ProfileState extends State<Profile> {
                           "Email:".toUpperCase(),
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                              fontSize: 18.0, color: Colors.white,backgroundColor: Colors.transparent,fontWeight: FontWeight.bold),
+                              fontSize: 18.0, color: Palette.greenLandLight,backgroundColor: Colors.transparent,fontWeight: FontWeight.bold),
                         ),
                         margin: new EdgeInsets.only(left: 15.0),
                       ),
                       new Container(
                         child: new Text(
-                          "hr.gravitinfosystem.com",
+                         UserEmail,
                           textAlign: TextAlign.start,
                           style: TextStyle(
-                              fontSize: 15.0, color: Colors.white, backgroundColor: Colors.transparent,fontWeight: FontWeight.bold),
+                              fontSize: 15.0, color: Palette.greenLandLight, backgroundColor: Colors.transparent,fontWeight: FontWeight.bold),
                         ),
                         margin: new EdgeInsets.only(left:5.0),
                       ),
@@ -217,7 +248,7 @@ class _ProfileState extends State<Profile> {
     final PasswordChange = new Padding(
         padding: EdgeInsets.all(0.0),
         child:   new Container(
-          color: Palette.greenLandLight,
+          //color: Palette.greenLandLight,
           child: Padding(
             padding: EdgeInsets.only(top:0.0),
               key: null,
@@ -231,8 +262,8 @@ class _ProfileState extends State<Profile> {
                       child: new Row(children: <Widget>[
                         new Container(
                           child: FlatButton.icon(
-                            icon: Icon(Icons.lock,color: Colors.white,), //`Icon` to display
-                            label: Text('Password Change'.toUpperCase(),style: TextStyle(fontSize: 18.0,color: Colors.white,backgroundColor: Colors.transparent,fontWeight: FontWeight.bold),),
+                            icon: Icon(Icons.lock,color: Palette.greenLandLight,), //`Icon` to display
+                            label: Text('Password Change'.toUpperCase(),style: TextStyle(fontSize: 18.0,color: Palette.greenLandLight,backgroundColor: Colors.transparent,fontWeight: FontWeight.bold),),
                             //`Text` to display
                             onPressed: () {
                               //Code to execute when Floating Action Button is clicked
@@ -248,10 +279,10 @@ class _ProfileState extends State<Profile> {
           ),
         )
     );
+//----------------------------------------------------------------------------------------//
     return new WillPopScope(
       onWillPop: () async {
-        Future.value(
-            false); //return a `Future` with false value so this route cant be popped or closed.
+        Navigator.of(context).pushNamed(HomePage.tag);//return a `Future` with false value so this route cant be popped or closed.
       },
       child: new Scaffold(
         //backgroundColor: Palette.greenLandLight,
@@ -364,9 +395,7 @@ class _ProfileState extends State<Profile> {
                   fit: BoxFit.cover,
                 ),
                 title: Text("Help".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
-                onTap: () {
-               Navigator.of(context).pushNamed(Help.tag);
-                },
+                onTap: () => _callPhone(),
               ),
               Divider(
                 height: 2.0,
@@ -385,7 +414,7 @@ class _ProfileState extends State<Profile> {
               ),
             ],
           )),
-
+//----------------------------------------------------------------------------------------//
         appBar: new AppBar(
           iconTheme: new IconThemeData(color: Colors.white),
           title: new Padding(
@@ -400,38 +429,36 @@ class _ProfileState extends State<Profile> {
             new Stack(
               children: <Widget>[
                 new IconButton(
+                  padding: new EdgeInsets.all(15.0),
                   icon: new Icon(
                     Icons.shopping_cart,
                     color: Colors.white,
+                    ),
+                  onPressed: null,
                   ),
-                  onPressed: () {
-
-                  },
-                ),
                 new Positioned(
                     child: new Stack(
                       children: <Widget>[
-                        new Icon(Icons.brightness_1,
-                            size: 20.0, color: Colors.grey),
+                        new Icon(null),
                         new Positioned(
-                            top: 4.0,
-                            right: 4,
+                            top: 5.0,
+                            right: 5,
                             child: new Center(
                               child: new Text(
-                                '10',
+                                ReciveCount.toString(),
                                 style: new TextStyle(
                                     color: Colors.white,
                                     fontSize: 12.0,
                                     fontWeight: FontWeight.w500),
-                              ),
-                            )),
+                                ),
+                              )),
                       ],
-                    )),
+                      )),
               ],
-            ),
+              ),
 
           ],
-        ),
+        ),//----------------------------------------------------------------------------------------//
         body: new ListView(
           shrinkWrap: true,
           children: <Widget>[
@@ -442,14 +469,15 @@ class _ProfileState extends State<Profile> {
         ),
       ),
     );
-
   }
-  //notifications..
+//----------------------------------------------------------------------------------------//
   @override
   void initState() {
     super.initState();
+    this.getProductCount();
     this.fetchData();
   }
+//----------------------------------------------------------------------------------------//
   void TapMessage(BuildContext context, String message) {
     var alert = new AlertDialog(
       title: new Text('Want to logout?'),
@@ -465,3 +493,4 @@ class _ProfileState extends State<Profile> {
     showDialog(context: context, child: alert);
   }
 }
+//----------------------------------------------------------------------------------------//

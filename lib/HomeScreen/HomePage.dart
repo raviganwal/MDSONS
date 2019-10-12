@@ -1,9 +1,10 @@
-import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mdsons/CategoryScreen/CategoryScreenList.dart';
-import 'package:mdsons/HelpScreen/Help.dart';
+import 'package:mdsons/TotalAddCartList/TotalAddCartList.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:mdsons/HomeScreen/HomeProductDetails.dart';
+import 'package:mdsons/HomeScreen/hotelAppTheme.dart';
 import 'package:mdsons/Preferences/Preferences.dart';
 import 'package:mdsons/SplashScreen/Splash.dart';
 import 'package:mdsons/ProductScreen/Product.dart';
@@ -13,31 +14,31 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mdsons/HomeScreen/model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+//---------------------------------------------------------------------------------------------------//
 class HomePage extends StatefulWidget {
   static String tag = 'HomePage';
-
   final String value;
   HomePage({Key key, this.value}) : super(key: key);
-
   @override
   _HomePageState createState() => new _HomePageState();
 }
-
+//---------------------------------------------------------------------------------------------------//
 class Palette {
   static Color greenLandLight = Color(0xFFE0318C);
 }
 class Palette1 {
   static Color greenLandLight1 = Color(0xFF222B78);
 }
+//---------------------------------------------------------------------------------------------------//
 class _HomePageState extends State<HomePage> {
-
   String name = '';
   String note = '';
   String UserName = '';
   String UserEmail = '';
   String UserContact = '';
   String CountProduct = '';
+  final String phone = 'tel:+917000624695';
   var focusNode = new FocusNode();
   int status = 0;
   TextEditingController subjectname = new TextEditingController();
@@ -50,7 +51,11 @@ class _HomePageState extends State<HomePage> {
   List<Posts> _search = [];
   var loading = false;
   String ReciveCount = " ";
-
+  TextEditingController controller = new TextEditingController();
+  int _id;
+  String ProductName="";
+  final itemSize = 100.0;
+//---------------------------------------------------------------------------------------------------//
   // ignore: missing_return
   Future<Null> fetchData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -58,11 +63,6 @@ class _HomePageState extends State<HomePage> {
     UserEmail = prefs.getString(Preferences.KEY_Email).toString();
     UserContact = prefs.getString(Preferences.KEY_Contact).toString();
     Userid = prefs.getString(Preferences.KEY_ID).toString();
-   // CountProduct = prefs.getString(Preferences.KEY_CountProduct).toString();
-    //print("UserEmail"+UserEmail);
-    //print("UserContact"+UserContact);
-    //print("KEY_CountProduct"+CountProduct);
-     //print("Userid"+Userid);
     setState(() {
       loading = true;
     });
@@ -81,35 +81,25 @@ class _HomePageState extends State<HomePage> {
       });
     }
   }
-
-
+//---------------------------------------------------------------------------------------------------//
   getProductCount() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Userid = prefs.getString(Preferences.KEY_ID).toString();
-    print("Userid"+Userid);
+    //print("Userid"+Userid);
       String GetCount =
           'http://gravitinfosystems.com/MDNS/MDN_APP/forcount.php?UserId='+Userid;
-
-      //print("GetCount " + GetCount);
-
       var res =
       await http.get(GetCount, headers: {"Accept": "application/json"});
-
       var dataLogin = json.decode(res.body);
      // print("ReciveData"+dataLogin.toString());
-
     ReciveCount = dataLogin["count"].toString();
    // print("GetCountFromServer"+ReciveCount);
-
       setState(() {
         //print("Success");
         //print("GetCountFromServer"+Userid);
       });
-
   }
-
-
-
+//---------------------------------------------------------------------------------------------------//
   removeData() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.remove(Preferences.KEY_ID);
@@ -119,17 +109,21 @@ class _HomePageState extends State<HomePage> {
     prefs.remove(Preferences.KEY_Contact);
     Navigator.of(context).pushNamed(Splash.tag);
   }
-
+//---------------------------------------------------------------------------------------------------//
   @override
   void initState() {
     this.getProductCount();
     this.fetchData();
   }
-
-  TextEditingController controller = new TextEditingController();
-  int _id;
-  String ProductName="";
-  final itemSize = 100.0;
+//---------------------------------------------------------------------------------------------------//
+  _callPhone() async {
+    if (await canLaunch(phone)) {
+      await launch(phone);
+    } else {
+      throw 'Could not Call Phone';
+    }
+  }
+//---------------------------------------------------------------------------------------------------//
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -143,7 +137,7 @@ class _HomePageState extends State<HomePage> {
       },
       child: Scaffold(
       drawer: _drawer(),
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Colors.grey[200],
       appBar: AppBar(
         title: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -172,7 +166,16 @@ class _HomePageState extends State<HomePage> {
                   Icons.shopping_cart,
                   color: Colors.white,
                 ),
-                onPressed: null,
+                onPressed: () {
+                  //print("hello"+id.toString());
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => TotalAddCartList(
+                          value: Userid.toString(),
+                          )),
+                    );
+                },
               ),
               new Positioned(
                   child: new Stack(
@@ -205,10 +208,6 @@ class _HomePageState extends State<HomePage> {
             child: new Padding(
               padding: const EdgeInsets.all(4.0),
               child: new GestureDetector(
-                child: new Card(
-                  //color: Colors.grey,
-                  elevation: 2.0,
-                  key: null,
                   child:ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: _list.length, itemBuilder: (context, i) {
@@ -224,14 +223,12 @@ class _HomePageState extends State<HomePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
                                 //SizedBox(height: 1.0),
-
                                 AspectRatio(
-                                  aspectRatio: 18.0 / 12.0,
-                                  child: Image.network(
-                                    imageurl+a.image,
-                                    fit: BoxFit.cover,
+                                  aspectRatio: 2,
+                                  child: Image.network(imageurl+a.image,
+                                                         fit: BoxFit.contain,
+                                                       ),
                                   ),
-                                ),
                                 SizedBox(height:5.0),
                                 new Padding(
                                   padding: EdgeInsets.fromLTRB(50.0, 0.0, 0.0, 0.0),
@@ -251,35 +248,30 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                 ),
                               ]),
-                          margin: const EdgeInsets.all(0.0),
-
+                          margin: const EdgeInsets.only(bottom:10.0),
                         ),
                       ),
                     );
                   }),
-                ),
+
               ),
             ),
           ),
+//---------------------------------------------------------------------------------------------------//
           Expanded(
             child: new Container(
               child: Column(
                 children: <Widget>[
-                  new Container(),
                   loading
                       ? Center(
                     child: CircularProgressIndicator(),
                   )
                       : Expanded(
-                    child: GridView.builder(
+                    child: ListView.builder(
 
-                      padding: const EdgeInsets.all(4.0),
+                      padding: const EdgeInsets.only(left: 5, right: 5, top: 1, bottom: 1),
                       //crossAxisSpacing: 10,
                       itemCount: _list.length,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        //padding: EdgeInsets.all(4.0),
-                        /*childAspectRatio: 8.0 / 9.0,*/),
                       itemBuilder: (context, i) {
                         final a = _list[i];
                         return new Container(
@@ -301,96 +293,150 @@ class _HomePageState extends State<HomePage> {
                               );
                               Navigator.of(context).push(route);
                             },
-                            child: new Card(
-                              key: null,
-                              elevation: 2.0,
-                              child: new Container(
-                                child: new Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      //SizedBox(height: 1.0),
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 2),
+                              child: InkWell(
+                                splashColor: Colors.transparent,
+                                /*onTap: () {
+                                  callback();
+                                },*/
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.all(Radius.circular(16.0)),
+                                    boxShadow: <BoxShadow>[
+                                      BoxShadow(
+                                        color: Colors.white,
 
-                                      AspectRatio(
-                                        aspectRatio: 18.0 / 12.0,
-                                        child: Image.network(
-                                          imageurl+a.image,
-                                          fit: BoxFit.cover,
                                         ),
-                                      ),
-                                     SizedBox(height:5.0),
-                                      new Padding(
-                                        padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                    ],
+                                    ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.all(Radius.circular(16.0)),
+                                    child: Stack(
+                                      children: <Widget>[
+                                        Column(
                                           children: <Widget>[
-                                            Text(
-                                              a.title.toUpperCase(),
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1,
-                                              style: TextStyle(
-                                                fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w300,
+                                            AspectRatio(
+                                              aspectRatio: 2,
+                                              child: Image.network(imageurl+a.image,
+                                                fit: BoxFit.contain,
+                                                ),
+                                              ),
+
+                                            Container(
+                                              color: HotelAppTheme.buildLightTheme().backgroundColor,
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: <Widget>[
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Padding(
+                                                        padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
+                                                        child: Column(
+                                                          mainAxisAlignment: MainAxisAlignment.center,
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: <Widget>[
+                                                            Text(
+                                                              a.title.toUpperCase(),textAlign: TextAlign.start,
+                                                              overflow: TextOverflow.ellipsis,
+                                                              maxLines: 1,
+                                                              style: TextStyle(
+                                                                  fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w300,
+                                                                ),
+                                                              ),
+                                                            Column(
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                              children: <Widget>[
+                                                                new Row(
+                                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                  children: <Widget>[
+                                                                    new Row(
+                                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                      children: <Widget>[
+                                                                        new Text(
+                                                                          /*"${widget.itemRating}",*/
+                                                                          "Rs."+a.mrp,
+                                                                            style: new TextStyle(fontSize: 13.0, color: Colors.grey,decoration: TextDecoration.lineThrough,),
+                                                                          ),
+                                                                        new Text(
+                                                                          /*"${widget.itemRating}",*/
+                                                                          " Rs."+a.body,
+                                                                            style: new TextStyle(fontSize: 13.0, color: Colors.black,fontWeight: FontWeight.bold),
+                                                                          ),
+
+                                                                      ],
+                                                                      ),
+                                                                    new Row(
+                                                                      mainAxisAlignment: MainAxisAlignment.start,
+                                                                      children: <Widget>[
+                                                                        new Container(
+                                                                          child: new CircleAvatar(
+                                                                            backgroundColor: Colors.white,
+                                                                            child: Image.asset('assets/images/discount.png'),
+                                                                            ),
+                                                                          margin: const EdgeInsets.only(right:0.0),
+                                                                          width: 15.0,
+                                                                          height: 15.0,
+                                                                          ),
+                                                                        new Container(
+                                                                          child: new Text(
+                                                                              a.Discount, style: new TextStyle(fontSize: 13.0, color: Colors.red,fontWeight: FontWeight.bold),
+                                                                            ),
+                                                                          margin: const EdgeInsets.only(right:20.0),
+                                                                          width: 15.0,
+                                                                          height: 15.0,
+                                                                          ),
+                                                                        /*new Text(
+                                                                          *//*"${widget.itemRating}",*//*
+                                                                          a.Discount,
+                                                                            style: new TextStyle(fontSize: 13.0, color: Colors.red,fontWeight: FontWeight.bold),
+                                                                          ),*/
+
+                                                                      ],
+                                                                      ),
+                                                                  ],
+                                                                  ),
+
+                                                              ],
+                                                              ),
+                                                          ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+
+                                                ],
+                                                ),
+                                              ),
+                                          ],
+                                          ),
+                                        Positioned(
+                                          top: 8,
+                                          right: 8,
+                                          child: Material(
+                                            color: Colors.transparent,
+                                            child: InkWell(
+                                              borderRadius: BorderRadius.all(
+                                                Radius.circular(32.0),
+                                                ),
+                                              onTap: () {},
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(8.0),
+                                                child: Icon(
+                                                  Icons.favorite_border,
+                                                  color:Colors.grey,
+                                                  ),
+                                                ),
                                               ),
                                             ),
-                                            //SizedBox(height: 0.1),
-                                            Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: <Widget>[
-                                                new Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                  children: <Widget>[
-                                                    new Row(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                      children: <Widget>[
-                                                        new Text(
-                                                          /*"${widget.itemRating}",*/
-                                                          "Rs."+a.mrp,
-                                                          style: new TextStyle(fontSize: 13.0, color: Colors.grey,decoration: TextDecoration.lineThrough,),
-                                                        ),
-                                                        new Text(
-                                                          /*"${widget.itemRating}",*/
-                                                          " Rs."+a.body,
-                                                          style: new TextStyle(fontSize: 13.0, color: Colors.black,fontWeight: FontWeight.bold),
-                                                        ),
-
-                                                      ],
-                                                    ),
-                                                    new Row(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                      children: <Widget>[
-                                                        new Container(
-                                                          child: new CircleAvatar(
-                                                            backgroundColor: Colors.white,
-                                                            child: Image.asset('assets/images/discount.png'),
-                                                          ),
-                                                          margin: const EdgeInsets.all(1.0),
-                                                          width: 15.0,
-                                                          height: 15.0,
-                                                        ),
-                                                        new Text(
-                                                          /*"${widget.itemRating}",*/
-                                                          a.Discount,
-                                                          style: new TextStyle(fontSize: 13.0, color: Colors.red,fontWeight: FontWeight.bold),
-                                                        ),
-
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-
-                                              ],
-                                            ),
-
-                                          ],
-                                        ),
+                                          )
+                                      ],
                                       ),
-                                    ]),
-                                margin: const EdgeInsets.all(5.0),
-                                height: 80.0,
-                                width: _width / 2,
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
                           ),
 
                         );
@@ -406,6 +452,7 @@ class _HomePageState extends State<HomePage> {
     ),
     );
   }
+//---------------------------------------------------------------------------------------------------//
   Widget _drawer() {
     return new Drawer(
         elevation: 20.0,
@@ -502,7 +549,7 @@ class _HomePageState extends State<HomePage> {
               ),
               title: Text("MyOrder".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
               onTap: () {
-               // Navigator.of(context).pushNamed(CategoryScreenList.tag);
+               // Navigator.of(context).pushNamed(HomeCartProductList.tag);
               },
             ),
             Divider(
@@ -516,9 +563,10 @@ class _HomePageState extends State<HomePage> {
                 fit: BoxFit.cover,
               ),
               title: Text("Help".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
-              onTap: () {
+             /* onTap: () {
                  Navigator.of(context).pushNamed(Help.tag);
-              },
+              },*/
+                onTap: () => _callPhone(),
             ),
             Divider(
               height: 2.0,
@@ -538,6 +586,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ));
   }
+//---------------------------------------------------------------------------------------------------//
   void TapMessage(BuildContext context, String message) {
     var alert = new AlertDialog(
       title: new Text('Want to logout?'),
@@ -552,5 +601,5 @@ class _HomePageState extends State<HomePage> {
     );
     showDialog(context: context, child: alert);
   }
-
 }
+//---------------------------------------------------------------------------------------------------//

@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mdsons/CategoryScreen/SubCategoryModel.dart';
+import 'package:mdsons/TotalAddCartList/TotalAddCartList.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mdsons/Preferences/Preferences.dart';
 class Palette {
@@ -74,7 +75,7 @@ class _MonthSelection extends State<SubCategoryList> {
     if (response.statusCode == 200) {
       final extractdata = jsonDecode(response.body);
       data = extractdata["data"];
-       //print("data"+data.toString());
+       print("data"+data.toString());
       setState(() {
         for (Map i in data) {
           _list.add(Posts.formJson(i));
@@ -181,7 +182,16 @@ class _MonthSelection extends State<SubCategoryList> {
                     Icons.shopping_cart,
                     color: Colors.white,
                   ),
-                  onPressed: null,
+                  onPressed: () {
+                    //print("hello"+id.toString());
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => TotalAddCartList(
+                            value: Userid.toString(),
+                            )),
+                      );
+                  },
                 ),
                 new Positioned(
                     child: new Stack(

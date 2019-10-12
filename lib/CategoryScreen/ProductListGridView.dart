@@ -4,43 +4,39 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mdsons/CategoryScreen/CategoryScreenList.dart';
-import 'package:mdsons/CategoryScreen/ProductGridViewDetails.dart';
+import 'package:mdsons/CategoryScreen/CategoryProductGridViewDetails.dart';
 import 'package:mdsons/CategoryScreen/SubCategoryList.dart';
 import 'package:mdsons/CategoryScreen/model.dart';
-import 'package:mdsons/HelpScreen/Help.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:mdsons/HomeScreen/HomePage.dart';
 import 'package:mdsons/ProductScreen/Product.dart';
 import 'package:mdsons/ProfileDetails/Profile.dart';
 import 'package:mdsons/SplashScreen/Splash.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mdsons/Preferences/Preferences.dart';
-
+//-------------------------------------------------------------------------------------//
 class Palette {
   static Color greenLandLight = Color(0xFFE0318C);
 }
 class Palette1 {
   static Color greenLandLight1 = Color(0xFF222B78);
 }
-
+//-------------------------------------------------------------------------------------//
 void main() {
   runApp(new MaterialApp(
     home: new ProductListGridView(),
   ));
 }
-
+//-------------------------------------------------------------------------------------//
 class ProductListGridView extends StatefulWidget {
   static String tag = 'ProductListGridView';
-
   final String value, value1, value2;
-
-
   ProductListGridView({Key key, this.value, this.value1, this.value2})
       : super(key: key);
-
   @override
   HomePageState createState() => new HomePageState();
 }
-
+//-------------------------------------------------------------------------------------//
 class HomePageState extends State<ProductListGridView> {
   String Userid= '';
   String ReciveCount = " ";
@@ -53,7 +49,10 @@ class HomePageState extends State<ProductListGridView> {
   String UserEmail = '';
   String UserContact = '';
   String ProductName="";
+  final String phone = 'tel:+917000624695';
   TextEditingController controller = new TextEditingController();
+  int _id;
+  String sendid ="";
 
   onSearch(String text) async {
     _search.clear();
@@ -67,7 +66,7 @@ class HomePageState extends State<ProductListGridView> {
     });
     setState(() {});
   }
-
+//-------------------------------------------------------------------------------------//
   // ignore: missing_return
   Future<Null> makeRequest() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -83,6 +82,7 @@ class HomePageState extends State<ProductListGridView> {
     if (response.statusCode == 200) {
       final extractdata = jsonDecode(response.body);
       data = extractdata["data"];
+      //print("data"+data.toString());
       setState(() {
         for (Map i in data) {
           _list.add(Posts.formJson(i));
@@ -91,48 +91,48 @@ class HomePageState extends State<ProductListGridView> {
       });
     }
   }
+//-------------------------------------------------------------------------------------//
   getProductCount() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Userid = prefs.getString(Preferences.KEY_ID).toString();
-    print("Userid"+Userid);
+    //print("Userid"+Userid);
     String GetCount =
         'http://gravitinfosystems.com/MDNS/MDN_APP/forcount.php?UserId='+Userid;
-
-    //print("GetCount " + GetCount);
-
     var res =
     await http.get(GetCount, headers: {"Accept": "application/json"});
-
     var dataLogin = json.decode(res.body);
     // print("ReciveData"+dataLogin.toString());
-
     ReciveCount = dataLogin["count"].toString();
     // print("GetCountFromServer"+ReciveCount);
-
     setState(() {
       //print("Success");
       //print("GetCountFromServer"+Userid);
     });
-
   }
+//-------------------------------------------------------------------------------------//
   Future<Null> BackScreen() async {
-    Navigator.of(context).pushNamed(SubCategoryList.tag);
+    Navigator.of(context).pushNamed(CategoryScreenList.tag);
   }
+//-------------------------------------------------------------------------------------//
   @override
   void initState() {
     this.getProductCount();
     this.makeRequest();
   }
-
+//----------------------------------------------------------------------------------------//
+  _callPhone() async {
+    if (await canLaunch(phone)) {
+      await launch(phone);
+    } else {
+      throw 'Could not Call Phone';
+    }
+  }
+//-------------------------------------------------------------------------------------//
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  int _id;
-  String sendid ="";
-
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double _width = width * 0.70;
-
     return new WillPopScope(
         onWillPop: BackScreen,
     child: Scaffold(
@@ -200,6 +200,7 @@ class HomePageState extends State<ProductListGridView> {
 
         ],
       ),
+//-------------------------------------------------------------------------------------//
       body: Container(
         child: Column(
           children: <Widget>[
@@ -331,8 +332,8 @@ class HomePageState extends State<ProductListGridView> {
                   );
                 },
               )
+//-------------------------------------------------------------------------------------//
                   : GridView.builder(
-
                 padding: const EdgeInsets.all(4),
                 //crossAxisSpacing: 10,
                 itemCount: _list.length,
@@ -351,7 +352,7 @@ class HomePageState extends State<ProductListGridView> {
                           "product_id"]);
                           ProductName = (data[i][
                           "product_name"]);//if you want to assign the index somewhere to check
-                          print("ProductName"+ProductName.toString());
+                          //print("ProductName"+ProductName.toString());
                         });
                         var route = new MaterialPageRoute(
                           builder: (BuildContext context) =>
@@ -372,7 +373,6 @@ class HomePageState extends State<ProductListGridView> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
                                 //SizedBox(height: 1.0),
-
                                 AspectRatio(
                                   aspectRatio: 18.0 / 12.0,
                                   child: Image.network(
@@ -442,7 +442,6 @@ class HomePageState extends State<ProductListGridView> {
 
                                         ],
                                       ),
-
                                     ],
                                   ),
                                 ),
@@ -463,6 +462,7 @@ class HomePageState extends State<ProductListGridView> {
     ),
     );
   }
+//-------------------------------------------------------------------------------------//
   Widget _drawer() {
     return new Drawer(
         elevation: 20.0,
@@ -573,9 +573,7 @@ class HomePageState extends State<ProductListGridView> {
                 fit: BoxFit.cover,
               ),
               title: Text("Help".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
-              onTap: () {
-               Navigator.of(context).pushNamed(Help.tag);
-              },
+              onTap: () => _callPhone(),
             ),
             Divider(
               height: 2.0,
@@ -595,6 +593,7 @@ class HomePageState extends State<ProductListGridView> {
           ],
         ));
   }
+//-------------------------------------------------------------------------------------//
   void TapMessage(BuildContext context, String message) {
     var alert = new AlertDialog(
       title: new Text('Want to logout?'),
@@ -609,6 +608,7 @@ class HomePageState extends State<ProductListGridView> {
     );
     showDialog(context: context, child: alert);
   }
+//-------------------------------------------------------------------------------------//
   removeData() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.remove(Preferences.KEY_ID);
@@ -619,3 +619,4 @@ class HomePageState extends State<ProductListGridView> {
     Navigator.of(context).pushNamed(Splash.tag);
   }
 }
+//-------------------------------------------------------------------------------------//
