@@ -13,7 +13,6 @@ class Posts {
   final String description;
   final String brand;
   final String count;
- // final String TotalAmount;
 
   Posts({this.userId, this.id, this.productname, this.SellingPrice,this.image,this.MRP,this.howtouse,this.mrp,this.Discount,this.productnumber,this.description,this.brand,this.count,this.QtyMRP});
 

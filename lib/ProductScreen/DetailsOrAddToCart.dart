@@ -1,4 +1,5 @@
 import 'package:mdsons/CategoryScreen/CategoryScreenList.dart';
+import 'package:mdsons/ProductScreen/ProductTotalCardList.dart';
 import 'package:mdsons/TotalAddCartList/TotalAddCartList.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mdsons/ProfileDetails/Profile.dart';
@@ -125,7 +126,7 @@ class _MonthSelection extends State<DetailsOrAddToCart> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => TotalAddCartList(
+                      builder: (context) => ProductTotalCardList(
                         value: id.toString(),
                         )),
                   );
@@ -188,17 +189,12 @@ class _MonthSelection extends State<DetailsOrAddToCart> {
                       new SingleChildScrollView(
                         child: new Column(
                           children: <Widget>[
-                            Container(
-                              margin: EdgeInsets.all(0),
-                              width: MediaQuery.of(context).size.width,
-                              height: 300,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  fit: BoxFit.fill,
-                                  image: NetworkImage(imageurl+a.image,),
-                                ),
+                            AspectRatio(
+                              aspectRatio: 2,
+                              child: Image.network(imageurl+a.image,
+                                                     fit: BoxFit.contain,
+                                                   ),
                               ),
-                            ),
                             new Card(
                               child: new Container(
                                 /* width: screenSize.width,*/
@@ -400,7 +396,7 @@ class _MonthSelection extends State<DetailsOrAddToCart> {
                     Icons.shopping_cart,
                     color: Colors.white,
                   ),
-                  onPressed: () {
+                  /*onPressed: () {
                     //print("hello"+id.toString());
                     Navigator.push(
                       context,
@@ -409,7 +405,7 @@ class _MonthSelection extends State<DetailsOrAddToCart> {
                             value: id.toString(),
                             )),
                       );
-                  },
+                  },*/
                   ),
                 new Positioned(
                     child: new Stack(

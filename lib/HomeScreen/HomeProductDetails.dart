@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mdsons/HomeScreen/HomePage.dart';
+import 'package:mdsons/HomeScreen/HomeTotalAddList.dart';
 import 'package:mdsons/ProductScreen/Model.dart';
 import 'package:mdsons/ProductScreen/Product.dart';
 import 'package:mdsons/ProfileDetails/Profile.dart';
@@ -62,8 +63,10 @@ class _MonthSelection extends State<HomeProductDetails> {
       loading = true;
     });
     _list.clear();
+    String url = 'http://gravitinfosystems.com/MDNS/MDN_APP/singleproduct.php?product_id='+widget.value.toString();
     final response =
-    await http.get('http://gravitinfosystems.com/MDNS/MDN_APP/singleproduct.php?product_id='+widget.value.toString());
+    await http.get(url);
+    print("url"+url);
     if (response.statusCode == 200) {
       var extractdata = jsonDecode(response.body);
       data = extractdata["data"];
@@ -82,7 +85,7 @@ class _MonthSelection extends State<HomeProductDetails> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     id = prefs.getString(Preferences.KEY_ID).toString();
     String url = 'http://gravitinfosystems.com/MDNS/MDN_APP/Cart.php?UserId='+id+'&ProductId='+StoreProductId;
-    //print("url"+url);
+   // print("url"+url);
     var response = await http
         .get(Uri.encodeFull(url), headers: {"Accept": "application/json"});
     setState(() {
@@ -137,8 +140,9 @@ class _MonthSelection extends State<HomeProductDetails> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => TotalAddCartList(
+                      builder: (context) => HomeTotalAddList(
                         value: id.toString(),
+                         value5: widget.value.toString()
                         )),
                   );
               },
@@ -203,17 +207,12 @@ class _MonthSelection extends State<HomeProductDetails> {
                       new SingleChildScrollView(
                         child: new Column(
                           children: <Widget>[
-                            Container(
-                              margin: EdgeInsets.all(0),
-                              width: MediaQuery.of(context).size.width,
-                              height: 300,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  fit: BoxFit.fill,
-                                  image: NetworkImage(imageurl+a.image,),
-                                ),
+                            AspectRatio(
+                              aspectRatio: 2,
+                              child: Image.network(imageurl+a.image,
+                                                     fit: BoxFit.contain,
+                                                   ),
                               ),
-                            ),
                             new Card(
                               child: new Container(
                                 /* width: screenSize.width,*/
@@ -431,7 +430,7 @@ class _MonthSelection extends State<HomeProductDetails> {
                   Icons.shopping_cart,
                   color: Colors.white,
                 ),
-                onPressed: () {
+                /*onPressed: () {
                   //print("hello"+id.toString());
                   Navigator.push(
                     context,
@@ -440,7 +439,7 @@ class _MonthSelection extends State<HomeProductDetails> {
                           value: id.toString(),
                           )),
                     );
-                },
+                },*/
               ),
               new Positioned(
                   child: new Stack(

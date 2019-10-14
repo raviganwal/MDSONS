@@ -30,6 +30,10 @@ dependencies:
   flutter_pagewise:
   shared_preferences: ^0.5.3+4
   url_launcher: ^4.1.0
+  image_picker: ^0.6.1+4
+  image_cropper: ^1.1.0
+
+
 
 
 
@@ -91,6 +95,7 @@ flutter:
     - assets/images/superman.jpg
     - assets/images/noimage.png
     - assets/images/discount.png
+    - assets/images/uploadimage.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

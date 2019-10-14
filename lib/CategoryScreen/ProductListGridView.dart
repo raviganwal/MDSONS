@@ -250,12 +250,11 @@ class HomePageState extends State<ProductListGridView> {
                                 //SizedBox(height: 1.0),
 
                                 AspectRatio(
-                                  aspectRatio: 18.0 / 12.0,
-                                  child: Image.network(
-                                    imageurl+b.image,
-                                    fit: BoxFit.cover,
+                                  aspectRatio: 2,
+                                  child: Image.network(imageurl+b.image,
+                                                         fit: BoxFit.contain,
+                                                       ),
                                   ),
-                                ),
                                 SizedBox(height:5.0),
                                 new Padding(
                                   padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
@@ -374,12 +373,11 @@ class HomePageState extends State<ProductListGridView> {
                               children: <Widget>[
                                 //SizedBox(height: 1.0),
                                 AspectRatio(
-                                  aspectRatio: 18.0 / 12.0,
-                                  child: Image.network(
-                                    imageurl+a.image,
-                                    fit: BoxFit.cover,
+                                  aspectRatio: 2,
+                                  child: Image.network(imageurl+a.image,
+                                                         fit: BoxFit.contain,
+                                                       ),
                                   ),
-                                ),
                                 SizedBox(height:5.0),
                                 new Padding(
                                   padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),

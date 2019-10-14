@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:mdsons/CategoryScreen/CategoryTotalAddList.dart';
 import 'package:mdsons/TotalAddCartList/TotalAddCartList.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mdsons/HomeScreen/HomePage.dart';
@@ -113,7 +114,7 @@ class _MonthSelection extends State<ProductGridViewDetails> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => TotalAddCartList(
+                      builder: (context) => CategoryTotalAddList(
                         value: id.toString(),
                         )),
                   );
@@ -174,17 +175,12 @@ class _MonthSelection extends State<ProductGridViewDetails> {
                       new SingleChildScrollView(
                         child: new Column(
                           children: <Widget>[
-                            Container(
-                              margin: EdgeInsets.all(0),
-                              width: MediaQuery.of(context).size.width,
-                              height: 300,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  fit: BoxFit.fill,
-                                  image: NetworkImage(imageurl+a.image,),
-                                ),
+                            AspectRatio(
+                              aspectRatio: 2,
+                              child: Image.network(imageurl+a.image,
+                                                     fit: BoxFit.contain,
+                                                   ),
                               ),
-                            ),
                             new Card(
                               child: new Container(
                                 /* width: screenSize.width,*/
@@ -396,7 +392,7 @@ class _MonthSelection extends State<ProductGridViewDetails> {
                   Icons.shopping_cart,
                   color: Colors.white,
                 ),
-                onPressed: () {
+                /*onPressed: () {
                   //print("hello"+id.toString());
                   Navigator.push(
                     context,
@@ -405,7 +401,7 @@ class _MonthSelection extends State<ProductGridViewDetails> {
                           value: id.toString(),
                           )),
                     );
-                },
+                },*/
               ),
               new Positioned(
                   child: new Stack(

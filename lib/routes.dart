@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:mdsons/CategoryScreen/CategoryScreenList.dart';
 import 'package:mdsons/CategoryScreen/CategoryProductGridViewDetails.dart';
+import 'package:mdsons/CategoryScreen/CategoryTotalAddList.dart';
 import 'package:mdsons/CategoryScreen/ProductListGridView.dart';
 import 'package:mdsons/CategoryScreen/SubCategoryList.dart';
+import 'package:mdsons/CheckOutScreen/CheckOut.dart';
+import 'package:mdsons/HomeScreen/HomeCheckOut.dart';
 import 'package:mdsons/HomeScreen/HomePage.dart';
 import 'package:mdsons/HomeScreen/HomeProductDetails.dart';
+import 'package:mdsons/HomeScreen/HomeTotalAddList.dart';
 import 'package:mdsons/LoginScreen/Login.dart';
 import 'package:mdsons/ProductScreen/DetailsOrAddToCart.dart';
 import 'package:mdsons/ProductScreen/Product.dart';
+import 'package:mdsons/ProductScreen/ProductCheckOut.dart';
+import 'package:mdsons/ProductScreen/ProductTotalCardList.dart';
 import 'package:mdsons/ProfileDetails/Profile.dart';
 import 'package:mdsons/SplashScreen/Splash.dart';
 import 'package:mdsons/TotalAddCartList/TotalAddCartList.dart';
@@ -26,5 +32,11 @@ final routes = {
   DetailsOrAddToCart.tag: (context) => DetailsOrAddToCart(),
   HomeProductDetails.tag: (context) => HomeProductDetails(),
   ProductGridViewDetails.tag: (context) => ProductGridViewDetails(),
-  TotalAddCartList.tag: (context) => TotalAddCartList()
+  TotalAddCartList.tag: (context) => TotalAddCartList(),
+  CheckOut.tag: (context) => CheckOut(),
+  HomeTotalAddList.tag: (context) => HomeTotalAddList(),
+  ProductTotalCardList.tag: (context) => ProductTotalCardList(),
+  ProductCheckOut.tag: (context) => ProductCheckOut(),
+  HomeCheckOut.tag: (context) => HomeCheckOut(),
+  CategoryTotalAddList.tag: (context) => CategoryTotalAddList()
 };

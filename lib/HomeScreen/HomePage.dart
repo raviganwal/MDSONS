@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mdsons/CategoryScreen/CategoryScreenList.dart';
@@ -54,7 +56,8 @@ class _HomePageState extends State<HomePage> {
   TextEditingController controller = new TextEditingController();
   int _id;
   String ProductName="";
-  final itemSize = 100.0;
+  DateTime backButtonPressTime;
+  static const snackBarDuration = Duration(seconds: 3);
 //---------------------------------------------------------------------------------------------------//
   // ignore: missing_return
   Future<Null> fetchData() async {
@@ -124,17 +127,19 @@ class _HomePageState extends State<HomePage> {
     }
   }
 //---------------------------------------------------------------------------------------------------//
+  /*Future<Null> BackScreen() async {
+    AppExit(context, "Exit!");
+  }*/
+//---------------------------------------------------------------------------------------------------//
   @override
   Widget build(BuildContext context) {
+    onWillPop: onWillPop;
     double width = MediaQuery.of(context).size.width;
     double _width = width * 0.70;
     double height = MediaQuery.of(context).size.height;
     double _height = height * 0.85;
     return new WillPopScope(
-      onWillPop: () async {
-        Future.value(
-            false); //return a `Future` with false value so this route cant be popped or closed.
-      },
+      //onWillPop: BackScreen,
       child: Scaffold(
       drawer: _drawer(),
       backgroundColor: Colors.grey[200],
@@ -208,6 +213,21 @@ class _HomePageState extends State<HomePage> {
             child: new Padding(
               padding: const EdgeInsets.all(4.0),
               child: new GestureDetector(
+             /*   onTap: () {
+                  setState(() {
+                    _id = data;
+                    ProductName = (data.toString());//if you want to assign the index somewhere to check
+                    //print("ProductName"+ProductName.toString());
+                  });
+                  var route = new MaterialPageRoute(
+                    builder: (BuildContext context) =>
+                    new HomeProductDetails(
+                        value: _id.toString(),
+                        value2: ProductName.toString(),
+                        value1: " ${ widget.value }"),
+                    );
+                  Navigator.of(context).push(route);
+                },*/
                   child:ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: _list.length, itemBuilder: (context, i) {
@@ -411,7 +431,7 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                           ],
                                           ),
-                                        Positioned(
+                                    /*    Positioned(
                                           top: 8,
                                           right: 8,
                                           child: Material(
@@ -430,7 +450,7 @@ class _HomePageState extends State<HomePage> {
                                                 ),
                                               ),
                                             ),
-                                          )
+                                          )*/
                                       ],
                                       ),
                                     ),
@@ -601,5 +621,23 @@ class _HomePageState extends State<HomePage> {
     );
     showDialog(context: context, child: alert);
   }
+//---------------------------------------------------------------------------------------------------//
+  Future<bool> onWillPop(BuildContext context) async {
+    DateTime currentTime = DateTime.now();
+
+    bool backButtonHasNotBeenPressedOrSnackBarHasBeenClosed =
+        backButtonPressTime == null ||
+            currentTime.difference(backButtonPressTime) > snackBarDuration;
+    if (backButtonHasNotBeenPressedOrSnackBarHasBeenClosed) {
+      backButtonPressTime = currentTime;
+      Scaffold.of(context).showSnackBar(snackBar);
+      return false;
+    }
+    return true;
+  }
+  final snackBar = SnackBar(
+    content: Text('Press back again to leave'),
+    duration: snackBarDuration,
+    );
 }
 //---------------------------------------------------------------------------------------------------//

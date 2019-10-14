@@ -4,9 +4,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mdsons/CategoryScreen/CategoryScreenList.dart';
 import 'package:mdsons/CheckOutScreen/CheckOut.dart';
+import 'package:mdsons/ProductScreen/ProductCheckOut.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mdsons/HomeScreen/HomePage.dart';
-import 'package:mdsons/TotalAddCartList/TotalCartModel.dart';
+import 'package:mdsons/ProductScreen/ProductTotalCartModel.dart';
 import 'package:mdsons/ProductScreen/Product.dart';
 import 'package:mdsons/ProfileDetails/Profile.dart';
 import 'package:mdsons/SplashScreen/Splash.dart';
@@ -21,19 +22,19 @@ class Palette2 {
   static Color greenLandLight2 = Color(0xFFE0318C);
 }
 //---------------------------------------------------------------------------------------------------//
-class TotalAddCartList extends StatefulWidget {
+class ProductTotalCardList extends StatefulWidget {
 
-  static String tag = 'TotalAddCartList';
+  static String tag = 'ProductTotalCardList';
   final String value;
   final String value4;
   final String value5;
 //---------------------------------------------------------------------------------------------------//
-  TotalAddCartList({Key key, this.value, this.value4, this.value5}) : super(key: key);
+  ProductTotalCardList({Key key, this.value, this.value4, this.value5}) : super(key: key);
   @override
-  _TotalAddCartList createState() => new _TotalAddCartList();
+  _ProductTotalCardList createState() => new _ProductTotalCardList();
 }
 //---------------------------------------------------------------------------------------------------//
-class _TotalAddCartList extends State<TotalAddCartList> {
+class _ProductTotalCardList extends State<ProductTotalCardList> {
   List data;
   List data1;
   String categoryid;
@@ -46,10 +47,9 @@ class _TotalAddCartList extends State<TotalAddCartList> {
   String CountProduct = '';
   String Userid = '';
   String ReciveCount = '';
-  String ReciveTotalPrice = '';
   String imageurl = 'https://gravitinfosystems.com/MDNS/uploads/';
   final String phone = 'tel:+917000624695';
-
+  String ReciveTotalPrice = '';
 //---------------------------------------------------------------------------------------------------//
   // ignore: missing_return
   Future<Null> fetchData() async {
@@ -63,13 +63,13 @@ class _TotalAddCartList extends State<TotalAddCartList> {
     });
     _list.clear();
     String Url ='http://gravitinfosystems.com/MDNS/MDN_APP/CartProduct.php?id='+widget.value.toString();
-    //print("CartProductListUrl"+Url);;
+    print("CartProductListUrl"+Url);;
     final response =
     await http.get(Url);
     if (response.statusCode == 200) {
       final extractdata = jsonDecode(response.body);
       data = extractdata["data"];
-      //print("data"+data.toString());
+      print("data"+data.toString());
       setState(() {
         for (Map i in data) {
           _list.add(Posts.formJson(i));
@@ -125,7 +125,7 @@ class _TotalAddCartList extends State<TotalAddCartList> {
   }
 //---------------------------------------------------------------------------------------------------//
   Future<Null> BackScreen() async {
-    Navigator.of(context).pushNamed(HomePage.tag);
+    Navigator.of(context).pushNamed(Product.tag);
   }
 //----------------------------------------------------------------------------------------//
   _callPhone() async {
@@ -206,10 +206,10 @@ class _TotalAddCartList extends State<TotalAddCartList> {
                                     a.productname,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
                                       color:Color(0xFF222B78),
-                                        ),
+                                      ),
                                     ),
                                   SizedBox(
                                     height: 10,
@@ -217,13 +217,13 @@ class _TotalAddCartList extends State<TotalAddCartList> {
                                   Text(
                                     "Total Add Item ${a.count}",
                                     style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 12,
                                       color:Color(0xFF222B78),
-                                        ),
+                                      ),
                                     ),
                                   SizedBox(
-                                     height: 5,
+                                    height: 5,
                                     ),
                                   Row(
                                     children: <Widget>[
@@ -231,22 +231,22 @@ class _TotalAddCartList extends State<TotalAddCartList> {
                                         child: Text(
                                           "MRP ${a.mrp}",
                                           style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12,
                                             color:Color(0xFF222B78),
-                                              ),
+                                            ),
                                           ),
                                         ),
                                       Icon(
                                         FontAwesomeIcons.rupeeSign,
                                         size: 18,
-                                          color:Color(0xFF222B78),
+                                        color:Color(0xFF222B78),
                                         ),
                                       new Text(a.QtyMRP.toString(), style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 18,
                                         color:Color(0xFF222B78),
-                                          ),
+                                        ),
                                                ),
                                       SizedBox(
                                         width: 5,
@@ -419,10 +419,10 @@ class _TotalAddCartList extends State<TotalAddCartList> {
                                   size: 18,
                                   color: Colors.white,), //`Icon` to display
                       label: Text('Check Out'.toUpperCase(),style: TextStyle(fontSize: 15.0, color: Colors.white,fontWeight: FontWeight.bold,)), //`Text` to display
-                onPressed: () {
-                     Navigator
-                         .of(context)
-                         .push(new MaterialPageRoute(builder: (_) => new CheckOut()));
+                      onPressed: () {
+                        Navigator
+                            .of(context)
+                            .push(new MaterialPageRoute(builder: (_) => new ProductCheckOut()));
                       },
                     ),
 
