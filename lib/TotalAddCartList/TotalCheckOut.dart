@@ -122,8 +122,8 @@ class _TotalCheckOutState extends State<TotalCheckOut> {
   request.fields['UserId'] = Userid;
   request.fields['TotalAmount'] = widget.value7.toString();
  // print(""+ widget.value7.toString());
-  //print("UserId"+request.fields['UserId'].toString());
-  //print("TotalAmount"+request.fields['TotalAmount'].toString());
+  print("UserId"+request.fields['UserId'].toString());
+  print("TotalAmount"+request.fields['TotalAmount'].toString());
   var multipartFile =  new http.MultipartFile("image", stream,length,filename: basename(imageFile.path));
   //print("multipartFile"+multipartFile.toString());
   request.files.add(multipartFile);
@@ -311,10 +311,10 @@ class _TotalCheckOutState extends State<TotalCheckOut> {
                       label: Text("send".toUpperCase().toString(),textAlign: TextAlign.left,style: TextStyle(fontSize: 15.0, color: Colors.white,fontWeight: FontWeight.bold,)), //`Text` to display
                       onPressed: () {
                         Upload(_image);
-                       /* Navigator.push(
+                      Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => HomePage()),
-                          );*/
+                          );
                         //print("hello");
                         // model.removeProduct(model.cart[index]);
                       },

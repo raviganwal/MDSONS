@@ -51,6 +51,13 @@ class HomePageState extends State<ProductListGridView> {
   String UserContact = '';
   String ProductName="";
   final String phone = 'tel:+917000624695';
+  String ProfileName="" ;
+  String ProfileData = '';
+  String ProfileMobile;
+  String ProfileAddress = '';
+  String ProfileStatus = '';
+  String ProfileUserType = '';
+  String ProfileEmail = '';
   TextEditingController controller = new TextEditingController();
   int _id;
   String sendid ="";
@@ -110,15 +117,35 @@ class HomePageState extends State<ProductListGridView> {
       //print("GetCountFromServer"+Userid);
     });
   }
-//-------------------------------------------------------------------------------------//
-  /*Future<Null> BackScreen() async {
-    Navigator.of(context).pushNamed(CategoryScreenList.tag);
-  }*/
+//------------------------------------------------------------------------------------------------//
+  Future<String> ProfileDisplay() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Userid = prefs.getString(Preferences.KEY_ID).toString();
+
+    String url = 'http://192.168.0.200/anuj/MDN/MDN_APP/ProfileDisplay.php?id='+Userid;
+    //print("url"+url);
+    var response = await http
+        .get(Uri.encodeFull(url), headers: {"Accept": "application/json"});
+
+    setState(() {
+      var extractdata = json.decode(response.body);
+      ProfileData = extractdata["data"].toString();
+      //print("ProfileData"+ProfileData.toString());
+      ProfileName = extractdata["data"]["Name"].toString();
+      ProfileMobile = extractdata["data"]["contact"].toString();
+      ProfileAddress = extractdata["data"]["address"].toString();
+      ProfileEmail = extractdata["data"]["Email"].toString();
+      //print("ProfileName"+ProfileName.toString());
+      //print("ProfileMobile"+ProfileMobile.toString());
+      // print("ProfileAddress"+ProfileAddress.toString());
+    });
+  }
 //-------------------------------------------------------------------------------------//
   @override
   void initState() {
     this.getProductCount();
     this.makeRequest();
+    this.ProfileDisplay();
   }
 //----------------------------------------------------------------------------------------//
   _callPhone() async {
@@ -151,7 +178,7 @@ class HomePageState extends State<ProductListGridView> {
               decoration: InputDecoration(
 
                   border: InputBorder.none,
-                  hintText: "Search Product",hintStyle: TextStyle(fontSize: 15.0, color: Colors.white,fontWeight: FontWeight.w500),
+                  hintText: "Search",hintStyle: TextStyle(fontSize: 15.0, color: Colors.white,fontWeight: FontWeight.w500),
                   filled: true,
                   prefixIcon: Icon(
                     Icons.search,color: Colors.white,
@@ -272,7 +299,7 @@ class HomePageState extends State<ProductListGridView> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: <Widget>[
                                       Text(
-                                        b.title.toUpperCase().substring(0,4),
+                                        b.title.toUpperCase(),
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
                                         style: TextStyle(
@@ -478,13 +505,13 @@ class HomePageState extends State<ProductListGridView> {
           padding: EdgeInsets.zero,
           children: <Widget>[
             UserAccountsDrawerHeader(
-              accountName: Text("Mr. "+UserName.toUpperCase(),style: TextStyle(
+              accountName: Text("Mr. "+ProfileName.toUpperCase(),style: TextStyle(
                   fontSize: 16.0,
                   color: Colors.white,
                   letterSpacing: 1.4,
                   backgroundColor: Colors.transparent,
                   fontWeight: FontWeight.bold),),
-              accountEmail: Text(UserEmail,style: TextStyle(
+              accountEmail: Text(ProfileEmail,style: TextStyle(
                   fontSize: 16.0,
                   color: Colors.white,
                   letterSpacing: 1.4,

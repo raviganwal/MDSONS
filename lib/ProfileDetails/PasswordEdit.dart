@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/gestures.dart' show DragStartBehavior;
@@ -7,24 +6,14 @@ import 'package:mdsons/TotalAddCartList/TotalAddCartList.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mdsons/Preferences/Preferences.dart';
 import 'package:mdsons/SplashScreen/Splash.dart';
-import 'package:flutter/material.dart';
 import 'package:mdsons/CategoryScreen/CategoryScreenList.dart';
 import 'package:mdsons/ProfileDetails/Profile.dart';
-import 'package:mdsons/TotalAddCartList/TotalAddCartList.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:mdsons/SplashScreen/Splash.dart';
-import 'dart:async';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:mdsons/Preferences/Preferences.dart';
 import 'package:mdsons/HomeScreen/HomePage.dart';
 import 'package:mdsons/ProductScreen/Product.dart';
 import 'dart:convert';
-import 'dart:io';
-import 'dart:async';
 import 'package:http/http.dart' as http;
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:flutter/services.dart';
-import 'package:url_launcher/url_launcher.dart';
+
 //----------------------------------------------------------------------------------------//
 class Palette {
   static Color greenLandLight = Color(0xFFE0318C);
@@ -134,6 +123,7 @@ class TextFormFieldDemoState extends State<PasswordEdit> {
   String ReciveCount = '';
   String Userid = '';
   String UserMessage = '';
+
 
   TextEditingController PasswordController = new TextEditingController();
   TextEditingController ConfirmPasswordController = new TextEditingController();

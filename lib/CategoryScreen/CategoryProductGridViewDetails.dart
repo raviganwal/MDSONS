@@ -47,6 +47,13 @@ class _MonthSelection extends State<ProductGridViewDetails> {
   String UserContact = '';
   final String phone = 'tel:+917000624695';
   String Userid= '';
+  String ProfileName="" ;
+  String ProfileData = '';
+  String ProfileMobile;
+  String ProfileAddress = '';
+  String ProfileStatus = '';
+  String ProfileUserType = '';
+  String ProfileEmail = '';
 //--------------------------------------------------------------------------------------------------------//
   // ignore: missing_return
   Future<Null> makeRequest() async {
@@ -157,11 +164,35 @@ class _MonthSelection extends State<ProductGridViewDetails> {
       throw 'Could not Call Phone';
     }
   }
+//------------------------------------------------------------------------------------------------//
+  Future<String> ProfileDisplay() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Userid = prefs.getString(Preferences.KEY_ID).toString();
+
+    String url = 'http://192.168.0.200/anuj/MDN/MDN_APP/ProfileDisplay.php?id='+Userid;
+    //print("url"+url);
+    var response = await http
+        .get(Uri.encodeFull(url), headers: {"Accept": "application/json"});
+
+    setState(() {
+      var extractdata = json.decode(response.body);
+      ProfileData = extractdata["data"].toString();
+      //print("ProfileData"+ProfileData.toString());
+      ProfileName = extractdata["data"]["Name"].toString();
+      ProfileMobile = extractdata["data"]["contact"].toString();
+      ProfileAddress = extractdata["data"]["address"].toString();
+      ProfileEmail = extractdata["data"]["Email"].toString();
+      //print("ProfileName"+ProfileName.toString());
+      //print("ProfileMobile"+ProfileMobile.toString());
+      // print("ProfileAddress"+ProfileAddress.toString());
+    });
+  }
 //---------------------------------------------------------------------------------------------------------------------------------------//
   @override
   void initState() {
     this.makeRequest();
     this.getProductCount();
+    this.ProfileDisplay();
   }
 //--------------------------------------------------------------------------------------------------------//
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -499,13 +530,13 @@ class _MonthSelection extends State<ProductGridViewDetails> {
           padding: EdgeInsets.zero,
           children: <Widget>[
             UserAccountsDrawerHeader(
-              accountName: Text("Mr. "+UserName.toUpperCase(),style: TextStyle(
+              accountName: Text("Mr. "+ProfileName.toUpperCase(),style: TextStyle(
                   fontSize: 16.0,
                   color: Colors.white,
                   letterSpacing: 1.4,
                   backgroundColor: Colors.transparent,
                   fontWeight: FontWeight.bold),),
-              accountEmail: Text(UserEmail,style: TextStyle(
+              accountEmail: Text(ProfileEmail,style: TextStyle(
                   fontSize: 16.0,
                   color: Colors.white,
                   letterSpacing: 1.4,

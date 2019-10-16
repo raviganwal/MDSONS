@@ -10,10 +10,7 @@ import 'package:mdsons/Preferences/Preferences.dart';
 import 'package:mdsons/HomeScreen/HomePage.dart';
 import 'package:mdsons/ProductScreen/Product.dart';
 import 'dart:convert';
-import 'dart:io';
-import 'dart:async';
 import 'package:http/http.dart' as http;
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/services.dart';
 //----------------------------------------------------------------------------------------//
 class Profile extends StatefulWidget {
@@ -55,6 +52,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   String ProfileAddress = '';
   String ProfileStatus = '';
   String ProfileUserType = '';
+  String ProfileEmail = '';
 //----------------------------------------------------------------------------------------//
   // ignore: missing_return
   Future<String> fetchData() async {
@@ -194,7 +192,29 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
       //print("GetCountFromServer"+Userid);
     });
   }
+//------------------------------------------------------------------------------------------------//
+  Future<String> ProfileDisplay() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Userid = prefs.getString(Preferences.KEY_ID).toString();
 
+    String url = 'http://192.168.0.200/anuj/MDN/MDN_APP/ProfileDisplay.php?id='+Userid;
+    //print("url"+url);
+    var response = await http
+        .get(Uri.encodeFull(url), headers: {"Accept": "application/json"});
+
+    setState(() {
+      var extractdata = json.decode(response.body);
+      ProfileData = extractdata["data"].toString();
+      //print("ProfileData"+ProfileData.toString());
+      ProfileName = extractdata["data"]["Name"].toString();
+      ProfileMobile = extractdata["data"]["contact"].toString();
+      ProfileAddress = extractdata["data"]["address"].toString();
+      ProfileEmail = extractdata["data"]["Email"].toString();
+      //print("ProfileName"+ProfileName.toString());
+      //print("ProfileMobile"+ProfileMobile.toString());
+      // print("ProfileAddress"+ProfileAddress.toString());
+    });
+  }
 //----------------------------------------------------------------------------------------//
   removeData() async {
     final prefs = await SharedPreferences.getInstance();
@@ -239,13 +259,13 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
               children: <Widget>[
                 UserAccountsDrawerHeader(
                   accountName: Text(
-                    "Mr. " + UserName.toUpperCase(), style: TextStyle(
+                    "Mr. " + ProfileName.toUpperCase(), style: TextStyle(
                       fontSize: 16.0,
                       color: Colors.white,
                       letterSpacing: 1.4,
                       backgroundColor: Colors.transparent,
                       fontWeight: FontWeight.bold),),
-                  accountEmail: Text(UserEmail, style: TextStyle(
+                  accountEmail: Text(ProfileEmail, style: TextStyle(
                       fontSize: 16.0,
                       color: Colors.white,
                       letterSpacing: 1.4,
@@ -715,6 +735,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     super.initState();
     this.getProductCount();
     this.fetchData();
+    this.ProfileDisplay();
   }
 
 //----------------------------------------------------------------------------------------//

@@ -16,6 +16,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:async/async.dart';
+import 'package:path/path.dart';
 //------------------------------------------------------------------------------------------//
 class Palette1 {
   static Color greenLandLight1 = Color(0xFF222B78);
@@ -44,6 +46,7 @@ class _ProductCheckOutState extends State<ProductCheckOut> {
   String id;
   bool statusDataSend = false;
   String ReciveCount = '';
+  String OrderID = '';
 //-------------------------------------------------------------------------------------------//
   @override
   void initState() {
@@ -81,24 +84,6 @@ class _ProductCheckOutState extends State<ProductCheckOut> {
       print("getImageFromGallery"+_image.toString());
     });
   }
-//---------------------------------------------------------------------------------------------------//
-  // ignore: missing_return
-  Future<String> SenddataRequest() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    id = prefs.getString(Preferences.KEY_ID).toString();
-    String url = 'http://gravitinfosystems.com/MDNS/MDN_APP/Cart.php?UserId='+id+'&ProductId='+widget.value7.toString()+'&ProductId='+widget.value8.toString();
-    // print("url"+url);
-    var response = await http
-        .get(Uri.encodeFull(url), headers: {"Accept": "application/json"});
-    setState(() {
-      var extractdata = json.decode(response.body);
-      statusDataSend = extractdata['status'];
-      print("status" + statusDataSend.toString());
-      setState(() {
-        print("Success");
-      });
-    });
-  }
 //----------------------------------------------------------------------------------------//
   _callPhone() async {
     if (await canLaunch(phone)) {
@@ -108,15 +93,6 @@ class _ProductCheckOutState extends State<ProductCheckOut> {
     }
   }
 //---------------------------------------------------------------------------------------------------//
-  Future<Null> BackScreen() async {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => ProductTotalCardList(
-            value: Userid.toString(),
-            )),
-      );
-  }
 //---------------------------------------------------------------------------------------------------//
   getProductCount() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -136,15 +112,48 @@ class _ProductCheckOutState extends State<ProductCheckOut> {
       //print("GetCountFromServer"+Userid);
     });
   }
+//---------------------------------------------------------------------------------------------------//
+
+  Future Upload(File imageFile) async {
+    var stream = new http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
+    var length = await imageFile.length();
+
+    var uri = Uri.parse("http://192.168.0.200/anuj/MDN/MDN_APP/CheckoutCart.php?PaymentImage=");
+    final response =
+    await http.get(uri);
+    if (response.statusCode == 200) {
+      final extractdata = jsonDecode(response.body);
+      OrderID = extractdata.toString();
+      print("OrderID"+OrderID.toString());
+    }
+    print("uri"+uri.toString());
+    var request = new http.MultipartRequest("POST", uri);
+    request.fields['UserId'] = Userid;
+    request.fields['TotalAmount'] = widget.value7.toString();
+    // print(""+ widget.value7.toString());
+    print("UserId"+request.fields['UserId'].toString());
+    print("TotalAmount"+request.fields['TotalAmount'].toString());
+    var multipartFile =  new http.MultipartFile("image", stream,length,filename: basename(imageFile.path));
+    //print("multipartFile"+multipartFile.toString());
+    request.files.add(multipartFile);
+
+    var respone = await request.send();
+    if (respone.statusCode==200) {
+      print("Image Uploaded");
+    }
+    else{
+      print("Image Failed");
+    }
+
+  }
+
 //-------------------------------------------------------------------------------------------//
   @override
   Widget build(BuildContext context) {
-    return new WillPopScope(
-      onWillPop: BackScreen,
-      child: new  Scaffold(
-        drawer: _drawer(),
+    return Scaffold(
+        //drawer: _drawer(),
         appBar: AppBar(
-          title: Text('Upload CheckOut Picture'),
+          title: Text('Upload Picture'),
           centerTitle: true,
           actions: <Widget>[
             new Stack(
@@ -290,7 +299,11 @@ class _ProductCheckOutState extends State<ProductCheckOut> {
                     icon: Icon(FontAwesomeIcons.paperPlane,color: Colors.white,), //`Icon` to display
                       label: Text("send".toUpperCase().toString(),textAlign: TextAlign.left,style: TextStyle(fontSize: 15.0, color: Colors.white,fontWeight: FontWeight.bold,)), //`Text` to display
                       onPressed: () {
-                        SenddataRequest();
+                        Upload(_image);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomePage()),
+                          );
                         //print("hello");
                         // model.removeProduct(model.cart[index]);
                       },
@@ -318,10 +331,9 @@ class _ProductCheckOutState extends State<ProductCheckOut> {
             ],
             ),
           ),
-        ),
-      );
+        );
   }
-  Widget _drawer() {
+  /*Widget _drawer() {
     return new Drawer(
         elevation: 20.0,
         child: ListView(
@@ -450,7 +462,7 @@ class _ProductCheckOutState extends State<ProductCheckOut> {
               ),
           ],
           ));
-  }
+  }*/
   //---------------------------------------------------------------------------------------------------//
   void TapMessage(BuildContext context, String message) {
     var alert = new AlertDialog(
@@ -474,7 +486,6 @@ class _ProductCheckOutState extends State<ProductCheckOut> {
     prefs.remove(Preferences.KEY_NAME);
     prefs.remove(Preferences.KEY_Email);
     prefs.remove(Preferences.KEY_Contact);
-    Navigator.of(context).pushNamed(Splash.tag);
   }
 }
 //-------------------------------------------------------------------------------------------//

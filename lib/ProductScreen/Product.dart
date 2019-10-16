@@ -54,6 +54,13 @@ class _ProductState extends State<Product> {
   String ReciveCount = " ";
   String ProductName="";
   final String phone = 'tel:+917000624695';
+  String ProfileName="" ;
+  String ProfileData = '';
+  String ProfileMobile;
+  String ProfileAddress = '';
+  String ProfileStatus = '';
+  String ProfileUserType = '';
+  String ProfileEmail = '';
 //---------------------------------------------------------------------------------------------------//
 
   onSearch(String text) async {
@@ -125,6 +132,29 @@ class _ProductState extends State<Product> {
       //print("GetCountFromServer"+Userid);
     });
   }
+//------------------------------------------------------------------------------------------------//
+  Future<String> ProfileDisplay() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Userid = prefs.getString(Preferences.KEY_ID).toString();
+
+    String url = 'http://192.168.0.200/anuj/MDN/MDN_APP/ProfileDisplay.php?id='+Userid;
+    //print("url"+url);
+    var response = await http
+        .get(Uri.encodeFull(url), headers: {"Accept": "application/json"});
+
+    setState(() {
+      var extractdata = json.decode(response.body);
+      ProfileData = extractdata["data"].toString();
+      //print("ProfileData"+ProfileData.toString());
+      ProfileName = extractdata["data"]["Name"].toString();
+      ProfileMobile = extractdata["data"]["contact"].toString();
+      ProfileAddress = extractdata["data"]["address"].toString();
+      ProfileEmail = extractdata["data"]["Email"].toString();
+      //print("ProfileName"+ProfileName.toString());
+      //print("ProfileMobile"+ProfileMobile.toString());
+      // print("ProfileAddress"+ProfileAddress.toString());
+    });
+  }
 //----------------------------------------------------------------------------------------//
   _callPhone() async {
     if (await canLaunch(phone)) {
@@ -138,6 +168,7 @@ class _ProductState extends State<Product> {
   void initState() {
     this.getProductCount();
     this.fetchData();
+    this.ProfileDisplay();
   }
 //---------------------------------------------------------------------------------------------------//
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -496,13 +527,13 @@ class _ProductState extends State<Product> {
           padding: EdgeInsets.zero,
           children: <Widget>[
             UserAccountsDrawerHeader(
-              accountName: Text("Mr. "+UserName.toUpperCase(),style: TextStyle(
+              accountName: Text("Mr. "+ProfileName.toUpperCase(),style: TextStyle(
                   fontSize: 16.0,
                   color: Colors.white,
                   letterSpacing: 1.4,
                   backgroundColor: Colors.transparent,
                   fontWeight: FontWeight.bold),),
-              accountEmail: Text(UserEmail,style: TextStyle(
+              accountEmail: Text(ProfileEmail,style: TextStyle(
                   fontSize: 16.0,
                   color: Colors.white,
                   letterSpacing: 1.4,
