@@ -13,6 +13,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mdsons/Preferences/Preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 //------------------------------------------------------------------------------------------//
 class Palette1 {
   static Color greenLandLight1 = Color(0xFF222B78);
@@ -23,8 +26,10 @@ class Palette2 {
 //-------------------------------------------------------------------------------------------//
 class HomeCheckOut extends StatefulWidget {
   static String tag = 'HomeCheckOut';
-  HomeCheckOut({Key key, this.title}) : super(key: key);
+  HomeCheckOut({Key key, this.title, this. value5, this.value6}) : super(key: key);
   final String title;
+  final String value5;
+  final String value6;
   @override
   _HomeCheckOutState createState() => new _HomeCheckOutState();
 }
@@ -36,10 +41,14 @@ class _HomeCheckOutState extends State<HomeCheckOut> {
   String UserContact = '';
   String Userid = '';
   final String phone = 'tel:+917000624695';
+  String id;
+  bool statusDataSend = false;
+  String ReciveCount = '';
 //-------------------------------------------------------------------------------------------//
   @override
   void initState() {
     this.fetchData();
+    this.getProductCount();
     super.initState();
   }
 //-------------------------------------------------------------------------------------------//
@@ -72,6 +81,43 @@ class _HomeCheckOutState extends State<HomeCheckOut> {
       print("getImageFromGallery"+_image.toString());
     });
   }
+//---------------------------------------------------------------------------------------------------//
+  // ignore: missing_return
+  Future<String> SenddataRequest() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    id = prefs.getString(Preferences.KEY_ID).toString();
+    String url = 'http://gravitinfosystems.com/MDNS/MDN_APP/Cart.php?UserId='+id+'&ProductId='+widget.value5.toString()+'&ProductId='+widget.value5.toString();
+    // print("url"+url);
+    var response = await http
+        .get(Uri.encodeFull(url), headers: {"Accept": "application/json"});
+    setState(() {
+      var extractdata = json.decode(response.body);
+      statusDataSend = extractdata['status'];
+      print("status" + statusDataSend.toString());
+      setState(() {
+        print("Success");
+      });
+    });
+  }
+//---------------------------------------------------------------------------------------------------//
+  getProductCount() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Userid = prefs.getString(Preferences.KEY_ID).toString();
+    //print("Userid"+Userid);
+    String GetProductCount =
+        'http://gravitinfosystems.com/MDNS/MDN_APP/forcount.php?UserId='+Userid;
+    //print("GetCount " + GetCount);
+    var res =
+    await http.get(GetProductCount, headers: {"Accept": "application/json"});
+    var dataLogin = json.decode(res.body);
+    // print("ReciveData"+dataLogin.toString());
+    ReciveCount = dataLogin["count"].toString();
+    // print("GetCountFromServer"+ReciveCount);
+    setState(() {
+      //print("Success");
+      //print("GetCountFromServer"+Userid);
+    });
+  }
 //----------------------------------------------------------------------------------------//
   _callPhone() async {
     if (await canLaunch(phone)) {
@@ -98,33 +144,132 @@ class _HomeCheckOutState extends State<HomeCheckOut> {
       child: new  Scaffold(
         drawer: _drawer(),
         appBar: AppBar(
-          title: Text('Upload Your Pic'),
+          title: Text('Upload CheckOut Picture'),
           centerTitle: true,
+          actions: <Widget>[
+            new Stack(
+              children: <Widget>[
+                new IconButton(
+                  padding: new EdgeInsets.all(15.0),
+                  icon: new Icon(
+                    Icons.shopping_cart,
+                    color: Colors.white,
+                    ),
+                  onPressed: () {
+                    //print("hello"+id.toString());
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => HomeTotalAddList(
+                            value: Userid.toString(),
+                            )),
+                      );
+                  },
+                  ),
+                new Positioned(
+                    child: new Stack(
+                      children: <Widget>[
+                        new Icon(null),
+                        new Positioned(
+                            top: 5.0,
+                            right: 5,
+                            child: new Center(
+                              child: new Text(
+                                ReciveCount.toString(),
+                                style: new TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12.0,
+                                    fontWeight: FontWeight.w500),
+                                ),
+                              )),
+                      ],
+                      )),
+              ],
+              ),
+
+          ],
           ),
         body: ListView(
           children: [
-            Container(
-              /* width: MediaQuery.of(context).size.width,
-              height: 200.0,*/
-              child: Center(
-                child: _image == null
-                    ? new Image.asset(
-                  'assets/images/uploadimage.png',
-                  fit: BoxFit.cover,
-                  )
-                    : Image.file(_image),
+           /* new SizedBox(
+              height: 2.0,
+              ),*/
+            new Card(
+              child: new Container(
+                padding: const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 15),
+                /* width: screenSize.width,*/
+              //  margin: new EdgeInsets.all(20.0),
+                  child: new Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      new SizedBox(
+                        //height: 1.0,
+                        ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          new Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              new Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: <Widget>[
+                                  new Text(
+                                    /*"${widget.itemRating}",*/
+                                    "total amount   ".toUpperCase(),
+                                      style: new TextStyle(fontSize: 12.0, color: Colors.black,fontWeight: FontWeight.bold),
+                                    ),
+                                  Icon(FontAwesomeIcons.rupeeSign,color: Colors.black,size: 15.0,),
+                                  new Text(
+                                    /*"${widget.itemRating}",*/
+                                    widget.value5.toString().toUpperCase(),
+                                      style: new TextStyle(fontSize: 12.0, color: Colors.black,fontWeight: FontWeight.bold),
+                                    ),
+
+                                ],
+                                ),
+                            ],
+                            ),
+
+                        ],
+                        ),
+                    ],
+                    ),
                 ),
               ),
-            Column(
+            new SizedBox(
+              height: 10.0,
+              ),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              color: Colors.grey[200],
+              height: 200.0,
+                child: Center(
+                  child: _image == null
+                      ? Text('No image selected.')
+                      : Image.file(_image),
+                  ),
+              ),
+            new SizedBox(
+              height: 10.0,
+              ),
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                new FlatButton.icon(
-                  //color: Colors.red,
-                  icon: Icon( FontAwesomeIcons.paperPlane,
+                FlatButton.icon(
+                  color:Color(0xFFE0318C),
+                  icon: Icon(FontAwesomeIcons.camera,color: Colors.white,), //`Icon` to display
+                    label: Text("Camera".toUpperCase().toString(),textAlign: TextAlign.left,style: TextStyle(fontSize: 15.0, color: Colors.white,fontWeight: FontWeight.bold,)), //`Text` to display
+                    onPressed: getImageFromCam,
+                  ),
+
+                FlatButton.icon(
+                  color:Color(0xFFE0318C),
+                  icon: Icon( FontAwesomeIcons.cameraRetro,
                                 size: 18,
-                                color:Color(0xFF222B78),), //`Icon` to display
-                    label: Text('Send'.toUpperCase(),style: TextStyle(fontSize: 15.0,color:Color(0xFF222B78),fontWeight: FontWeight.bold,)), //`Text` to display
-                  //onPressed: getImageFromGallery,
+                                color: Colors.white,), //`Icon` to display
+                    label: Text('gallery'.toUpperCase(),style: TextStyle(fontSize: 15.0, color: Colors.white,fontWeight: FontWeight.bold,)), //`Text` to display
+                    onPressed: getImageFromGallery,
                   ),
               ],
               ),
@@ -142,15 +287,19 @@ class _HomeCheckOutState extends State<HomeCheckOut> {
                   color:Color(0xFF222B78),
                   child: new FlatButton.icon(
                     //color: Colors.red,
-                    icon: Icon(FontAwesomeIcons.camera,color: Colors.white,), //`Icon` to display
-                      label: Text("Camera".toUpperCase().toString(),textAlign: TextAlign.left,style: TextStyle(fontSize: 15.0, color: Colors.white,fontWeight: FontWeight.bold,)), //`Text` to display
-                      onPressed: getImageFromCam,
+                    icon: Icon(FontAwesomeIcons.paperPlane,color: Colors.white,), //`Icon` to display
+                      label: Text("send".toUpperCase().toString(),textAlign: TextAlign.left,style: TextStyle(fontSize: 15.0, color: Colors.white,fontWeight: FontWeight.bold,)), //`Text` to display
+                      onPressed: () {
+                          SenddataRequest();
+                        //print("hello");
+                        // model.removeProduct(model.cart[index]);
+                      },
                     ),
 
                   ),
-                flex: 2,
+                flex: 1,
                 ),
-              Expanded(
+              /*Expanded(
                 child: Container(
                   height: 50,
                   color:Color(0xFFE0318C),
@@ -165,7 +314,7 @@ class _HomeCheckOutState extends State<HomeCheckOut> {
 
                   ),
                 flex: 3,
-                ),
+                ),*/
             ],
             ),
           ),

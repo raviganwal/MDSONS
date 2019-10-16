@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mdsons/CategoryScreen/CategoryCheckOutScreen.dart';
 import 'package:mdsons/CategoryScreen/CategoryScreenList.dart';
 import 'package:mdsons/CategoryScreen/CategoryProductGridViewDetails.dart';
 import 'package:mdsons/CategoryScreen/CategoryTotalAddList.dart';
@@ -14,9 +15,11 @@ import 'package:mdsons/ProductScreen/DetailsOrAddToCart.dart';
 import 'package:mdsons/ProductScreen/Product.dart';
 import 'package:mdsons/ProductScreen/ProductCheckOut.dart';
 import 'package:mdsons/ProductScreen/ProductTotalCardList.dart';
+import 'package:mdsons/ProfileDetails/PasswordEdit.dart';
 import 'package:mdsons/ProfileDetails/Profile.dart';
 import 'package:mdsons/SplashScreen/Splash.dart';
 import 'package:mdsons/TotalAddCartList/TotalAddCartList.dart';
+import 'package:mdsons/TotalAddCartList/TotalCheckOut.dart';
 
 final routes = {
   '/Splash': (BuildContext context) => new Splash(),
@@ -38,5 +41,8 @@ final routes = {
   ProductTotalCardList.tag: (context) => ProductTotalCardList(),
   ProductCheckOut.tag: (context) => ProductCheckOut(),
   HomeCheckOut.tag: (context) => HomeCheckOut(),
-  CategoryTotalAddList.tag: (context) => CategoryTotalAddList()
+  CategoryTotalAddList.tag: (context) => CategoryTotalAddList(),
+  CategoryCheckOutScreen.tag: (context) => CategoryCheckOutScreen(),
+  TotalCheckOut.tag: (context) => TotalCheckOut(),
+  PasswordEdit.tag: (context) => PasswordEdit()
 };

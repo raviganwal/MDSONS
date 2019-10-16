@@ -24,17 +24,17 @@ class Palette2 {
   static Color greenLandLight2 = Color(0xFFE0318C);
 }
 //-------------------------------------------------------------------------------------------//
-class ProductCheckOut extends StatefulWidget {
-  static String tag = 'ProductCheckOut';
-  ProductCheckOut({Key key, this.title, this.value7, this.value8}) : super(key: key);
+class CategoryCheckOutScreen extends StatefulWidget {
+  static String tag = 'CategoryCheckOutScreen';
+  CategoryCheckOutScreen({Key key, this.title, this.value7, this.value8}) : super(key: key);
   final String title;
   final String value7;
   final String value8;
   @override
-  _ProductCheckOutState createState() => new _ProductCheckOutState();
+  _CategoryCheckOutScreenState createState() => new _CategoryCheckOutScreenState();
 }
 //-------------------------------------------------------------------------------------------//
-class _ProductCheckOutState extends State<ProductCheckOut> {
+class _CategoryCheckOutScreenState extends State<CategoryCheckOutScreen> {
   File _image;
   String UserName = '';
   String UserEmail = '';
@@ -43,12 +43,10 @@ class _ProductCheckOutState extends State<ProductCheckOut> {
   final String phone = 'tel:+917000624695';
   String id;
   bool statusDataSend = false;
-  String ReciveCount = '';
 //-------------------------------------------------------------------------------------------//
   @override
   void initState() {
     this.fetchData();
-    this.getProductCount();
     super.initState();
   }
 //-------------------------------------------------------------------------------------------//
@@ -117,25 +115,6 @@ class _ProductCheckOutState extends State<ProductCheckOut> {
             )),
       );
   }
-//---------------------------------------------------------------------------------------------------//
-  getProductCount() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    Userid = prefs.getString(Preferences.KEY_ID).toString();
-    //print("Userid"+Userid);
-    String GetProductCount =
-        'http://gravitinfosystems.com/MDNS/MDN_APP/forcount.php?UserId='+Userid;
-    //print("GetCount " + GetCount);
-    var res =
-    await http.get(GetProductCount, headers: {"Accept": "application/json"});
-    var dataLogin = json.decode(res.body);
-    // print("ReciveData"+dataLogin.toString());
-    ReciveCount = dataLogin["count"].toString();
-    // print("GetCountFromServer"+ReciveCount);
-    setState(() {
-      //print("Success");
-      //print("GetCountFromServer"+Userid);
-    });
-  }
 //-------------------------------------------------------------------------------------------//
   @override
   Widget build(BuildContext context) {
@@ -146,48 +125,6 @@ class _ProductCheckOutState extends State<ProductCheckOut> {
         appBar: AppBar(
           title: Text('Upload CheckOut Picture'),
           centerTitle: true,
-          actions: <Widget>[
-            new Stack(
-              children: <Widget>[
-                new IconButton(
-                  padding: new EdgeInsets.all(15.0),
-                  icon: new Icon(
-                    Icons.shopping_cart,
-                    color: Colors.white,
-                    ),
-                  onPressed: () {
-                    //print("hello"+id.toString());
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ProductTotalCardList(
-                            value: Userid.toString(),
-                            )),
-                      );
-                  },
-                  ),
-                new Positioned(
-                    child: new Stack(
-                      children: <Widget>[
-                        new Icon(null),
-                        new Positioned(
-                            top: 5.0,
-                            right: 5,
-                            child: new Center(
-                              child: new Text(
-                                ReciveCount.toString(),
-                                style: new TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12.0,
-                                    fontWeight: FontWeight.w500),
-                                ),
-                              )),
-                      ],
-                      )),
-              ],
-              ),
-
-          ],
           ),
         body: ListView(
           children: [

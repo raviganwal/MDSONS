@@ -1,3 +1,4 @@
+import 'package:mdsons/CategoryScreen/CategoryTotalAddList.dart';
 import 'package:mdsons/CategoryScreen/ProductListGridView.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -187,7 +188,7 @@ class _MonthSelection extends State<SubCategoryList> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => TotalAddCartList(
+                          builder: (context) => CategoryTotalAddList(
                             value: Userid.toString(),
                             )),
                       );

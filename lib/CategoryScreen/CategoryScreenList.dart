@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:mdsons/CategoryScreen/CategoryTotalAddList.dart';
 import 'package:mdsons/TotalAddCartList/TotalAddCartList.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mdsons/HomeScreen/HomePage.dart';
@@ -216,7 +217,7 @@ class _NextPage extends State<CategoryScreenList> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => TotalAddCartList(
+                          builder: (context) => CategoryTotalAddList(
                             value: Userid.toString(),
                             )),
                       );

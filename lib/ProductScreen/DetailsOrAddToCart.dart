@@ -52,7 +52,9 @@ class _MonthSelection extends State<DetailsOrAddToCart> {
   String UserName = '';
   String UserEmail = '';
   String UserContact = '';
+  String ReciveCountNumber = '';
   String URl = '';
+  String Userid = '';
   final String phone = 'tel:+917000624695';
 //---------------------------------------------------------------------------------------------------//
   // ignore: missing_return
@@ -104,6 +106,24 @@ class _MonthSelection extends State<DetailsOrAddToCart> {
       print("RecivedMessage"+RecivedMessage);*/
     });
   }
+//-------------------------------------------------------------------------------------//
+  getProductCount() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Userid = prefs.getString(Preferences.KEY_ID).toString();
+    //print("Userid"+Userid);
+    String GetCount =
+        'http://gravitinfosystems.com/MDNS/MDN_APP/forcount.php?UserId='+Userid;
+    var res =
+    await http.get(GetCount, headers: {"Accept": "application/json"});
+    var dataLogin = json.decode(res.body);
+    // print("ReciveData"+dataLogin.toString());
+    RecivedCount = dataLogin["count"].toString();
+    // print("GetCountFromServer"+ReciveCount);
+    setState(() {
+      //print("Success");
+      //print("GetCountFromServer"+Userid);
+    });
+  }
 //---------------------------------------------------------------------------------------------------//
   Future<void> _ackAlert() async {
     return showDialog<void>(
@@ -146,6 +166,7 @@ class _MonthSelection extends State<DetailsOrAddToCart> {
   @override
   void initState() {
     this.makeRequest();
+    this.getProductCount();
   }
 //----------------------------------------------------------------------------------------//
   _callPhone() async {

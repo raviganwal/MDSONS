@@ -46,6 +46,7 @@ class _MonthSelection extends State<ProductGridViewDetails> {
   String UserEmail = '';
   String UserContact = '';
   final String phone = 'tel:+917000624695';
+  String Userid= '';
 //--------------------------------------------------------------------------------------------------------//
   // ignore: missing_return
   Future<Null> makeRequest() async {
@@ -126,10 +127,28 @@ class _MonthSelection extends State<ProductGridViewDetails> {
       },
       );
   }
-//-------------------------------------------------------------------------------------------------------------//
-  Future<Null> BackScreen() async {
-    Navigator.of(context).pushNamed(CategoryScreenList.tag);
+//-------------------------------------------------------------------------------------//
+  getProductCount() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Userid = prefs.getString(Preferences.KEY_ID).toString();
+    //print("Userid"+Userid);
+    String GetCount =
+        'http://gravitinfosystems.com/MDNS/MDN_APP/forcount.php?UserId='+Userid;
+    var res =
+    await http.get(GetCount, headers: {"Accept": "application/json"});
+    var dataLogin = json.decode(res.body);
+    // print("ReciveData"+dataLogin.toString());
+    RecivedCount = dataLogin["count"].toString();
+    // print("GetCountFromServer"+ReciveCount);
+    setState(() {
+      //print("Success");
+      //print("GetCountFromServer"+Userid);
+    });
   }
+//-------------------------------------------------------------------------------------------------------------//
+  /*Future<Null> BackScreen() async {
+    Navigator.of(context).pushNamed(CategoryScreenList.tag);
+  }*/
 //---------------------------------------------------------------------------------------------------//
   _callPhone() async {
     if (await canLaunch(phone)) {
@@ -142,6 +161,7 @@ class _MonthSelection extends State<ProductGridViewDetails> {
   @override
   void initState() {
     this.makeRequest();
+    this.getProductCount();
   }
 //--------------------------------------------------------------------------------------------------------//
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -367,9 +387,7 @@ class _MonthSelection extends State<ProductGridViewDetails> {
       ),
     );
 //--------------------------------------------------------------------------------------------------------//
-    return new WillPopScope(
-        onWillPop: BackScreen,
-    child: Scaffold(
+   return Scaffold(
       drawer: _drawer(),
       key: _scaffoldKey,
       appBar: new AppBar(
@@ -392,16 +410,16 @@ class _MonthSelection extends State<ProductGridViewDetails> {
                   Icons.shopping_cart,
                   color: Colors.white,
                 ),
-                /*onPressed: () {
+                onPressed: () {
                   //print("hello"+id.toString());
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => TotalAddCartList(
+                        builder: (context) => CategoryTotalAddList(
                           value: id.toString(),
                           )),
                     );
-                },*/
+                },
               ),
               new Positioned(
                   child: new Stack(
@@ -472,8 +490,7 @@ class _MonthSelection extends State<ProductGridViewDetails> {
           ],
         ),
       ),
-    ),
-        );
+    );
   }
   Widget _drawer() {
     return new Drawer(

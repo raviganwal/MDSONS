@@ -13,9 +13,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mdsons/Preferences/Preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:async/async.dart';
+import 'package:path/path.dart';
 //------------------------------------------------------------------------------------------//
 class Palette1 {
   static Color greenLandLight1 = Color(0xFF222B78);
@@ -24,17 +25,17 @@ class Palette2 {
   static Color greenLandLight2 = Color(0xFFE0318C);
 }
 //-------------------------------------------------------------------------------------------//
-class ProductCheckOut extends StatefulWidget {
+class TotalCheckOut extends StatefulWidget {
   static String tag = 'ProductCheckOut';
-  ProductCheckOut({Key key, this.title, this.value7, this.value8}) : super(key: key);
+  TotalCheckOut({Key key, this.title, this.value7, this.value8}) : super(key: key);
   final String title;
   final String value7;
   final String value8;
   @override
-  _ProductCheckOutState createState() => new _ProductCheckOutState();
+  _TotalCheckOutState createState() => new _TotalCheckOutState();
 }
 //-------------------------------------------------------------------------------------------//
-class _ProductCheckOutState extends State<ProductCheckOut> {
+class _TotalCheckOutState extends State<TotalCheckOut> {
   File _image;
   String UserName = '';
   String UserEmail = '';
@@ -44,6 +45,7 @@ class _ProductCheckOutState extends State<ProductCheckOut> {
   String id;
   bool statusDataSend = false;
   String ReciveCount = '';
+  String OrderID = '';
 //-------------------------------------------------------------------------------------------//
   @override
   void initState() {
@@ -55,6 +57,26 @@ class _ProductCheckOutState extends State<ProductCheckOut> {
   @override
   void dispose() {
     super.dispose();
+  }
+//---------------------------------------------------------------------------------------------------//
+  getProductCount() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Userid = prefs.getString(Preferences.KEY_ID).toString();
+    //print("Userid"+Userid);
+    String GetCount =
+        'http://gravitinfosystems.com/MDNS/MDN_APP/forcount.php?UserId=' +
+            Userid;
+    //print("GetCount " + GetCount);
+    var res =
+    await http.get(GetCount, headers: {"Accept": "application/json"});
+    var dataLogin = json.decode(res.body);
+    // print("ReciveData"+dataLogin.toString());
+    ReciveCount = dataLogin["count"].toString();
+    // print("GetCountFromServer"+ReciveCount);
+    setState(() {
+      //print("Success");
+      //print("GetCountFromServer"+Userid);
+    });
   }
 //-------------------------------------------------------------------------------------------//
   Future<Null> fetchData() async {
@@ -82,23 +104,40 @@ class _ProductCheckOutState extends State<ProductCheckOut> {
     });
   }
 //---------------------------------------------------------------------------------------------------//
-  // ignore: missing_return
-  Future<String> SenddataRequest() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    id = prefs.getString(Preferences.KEY_ID).toString();
-    String url = 'http://gravitinfosystems.com/MDNS/MDN_APP/Cart.php?UserId='+id+'&ProductId='+widget.value7.toString()+'&ProductId='+widget.value8.toString();
-    // print("url"+url);
-    var response = await http
-        .get(Uri.encodeFull(url), headers: {"Accept": "application/json"});
-    setState(() {
-      var extractdata = json.decode(response.body);
-      statusDataSend = extractdata['status'];
-      print("status" + statusDataSend.toString());
-      setState(() {
-        print("Success");
-      });
-    });
+
+  Future Upload(File imageFile) async {
+  var stream = new http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
+  var length = await imageFile.length();
+
+  var uri = Uri.parse("http://192.168.0.200/anuj/MDN/MDN_APP/CheckoutCart.php?PaymentImage=");
+  final response =
+  await http.get(uri);
+  if (response.statusCode == 200) {
+    final extractdata = jsonDecode(response.body);
+    OrderID = extractdata.toString();
+    print("OrderID"+OrderID.toString());
   }
+  print("uri"+uri.toString());
+  var request = new http.MultipartRequest("POST", uri);
+  request.fields['UserId'] = Userid;
+  request.fields['TotalAmount'] = widget.value7.toString();
+ // print(""+ widget.value7.toString());
+  //print("UserId"+request.fields['UserId'].toString());
+  //print("TotalAmount"+request.fields['TotalAmount'].toString());
+  var multipartFile =  new http.MultipartFile("image", stream,length,filename: basename(imageFile.path));
+  //print("multipartFile"+multipartFile.toString());
+  request.files.add(multipartFile);
+
+  var respone = await request.send();
+  if (respone.statusCode==200) {
+    print("Image Uploaded");
+  }
+  else{
+    print("Image Failed");
+  }
+
+  }
+
 //----------------------------------------------------------------------------------------//
   _callPhone() async {
     if (await canLaunch(phone)) {
@@ -108,7 +147,7 @@ class _ProductCheckOutState extends State<ProductCheckOut> {
     }
   }
 //---------------------------------------------------------------------------------------------------//
-  Future<Null> BackScreen() async {
+  /*Future<Null> BackScreen() async {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -116,35 +155,16 @@ class _ProductCheckOutState extends State<ProductCheckOut> {
             value: Userid.toString(),
             )),
       );
-  }
-//---------------------------------------------------------------------------------------------------//
-  getProductCount() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    Userid = prefs.getString(Preferences.KEY_ID).toString();
-    //print("Userid"+Userid);
-    String GetProductCount =
-        'http://gravitinfosystems.com/MDNS/MDN_APP/forcount.php?UserId='+Userid;
-    //print("GetCount " + GetCount);
-    var res =
-    await http.get(GetProductCount, headers: {"Accept": "application/json"});
-    var dataLogin = json.decode(res.body);
-    // print("ReciveData"+dataLogin.toString());
-    ReciveCount = dataLogin["count"].toString();
-    // print("GetCountFromServer"+ReciveCount);
-    setState(() {
-      //print("Success");
-      //print("GetCountFromServer"+Userid);
-    });
-  }
+  }*/
 //-------------------------------------------------------------------------------------------//
   @override
   Widget build(BuildContext context) {
     return new WillPopScope(
-      onWillPop: BackScreen,
+     // onWillPop: BackScreen,
       child: new  Scaffold(
-        drawer: _drawer(),
+        //drawer: _drawer(),
         appBar: AppBar(
-          title: Text('Upload CheckOut Picture'),
+          title: Text('Upload Picture'),
           centerTitle: true,
           actions: <Widget>[
             new Stack(
@@ -160,7 +180,7 @@ class _ProductCheckOutState extends State<ProductCheckOut> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => ProductTotalCardList(
+                          builder: (context) => TotalAddCartList(
                             value: Userid.toString(),
                             )),
                       );
@@ -246,8 +266,8 @@ class _ProductCheckOutState extends State<ProductCheckOut> {
               height: 200.0,
               child: Center(
                 child: _image == null
-                    ? Text('No image selected.')
-                    : Image.file(_image),
+                    ? new Text('No image selected.')
+                    : new Image.file(_image),
                 ),
               ),
             new SizedBox(
@@ -290,7 +310,11 @@ class _ProductCheckOutState extends State<ProductCheckOut> {
                     icon: Icon(FontAwesomeIcons.paperPlane,color: Colors.white,), //`Icon` to display
                       label: Text("send".toUpperCase().toString(),textAlign: TextAlign.left,style: TextStyle(fontSize: 15.0, color: Colors.white,fontWeight: FontWeight.bold,)), //`Text` to display
                       onPressed: () {
-                        SenddataRequest();
+                        Upload(_image);
+                       /* Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomePage()),
+                          );*/
                         //print("hello");
                         // model.removeProduct(model.cart[index]);
                       },
@@ -321,7 +345,7 @@ class _ProductCheckOutState extends State<ProductCheckOut> {
         ),
       );
   }
-  Widget _drawer() {
+ /* Widget _drawer() {
     return new Drawer(
         elevation: 20.0,
         child: ListView(
@@ -357,7 +381,7 @@ class _ProductCheckOutState extends State<ProductCheckOut> {
                 ),
               title: Text("Home".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
               onTap: () {
-                Navigator.of(context).pushNamed(HomePage.tag);
+                //Navigator.of(context).pushNamed(HomePage.tag);
               },
               ),
             Divider(
@@ -372,7 +396,7 @@ class _ProductCheckOutState extends State<ProductCheckOut> {
                 ),
               title: Text("Profile".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
               onTap: () {
-                Navigator.of(context).pushNamed(Profile.tag);
+                //Navigator.of(p).pushNamed(Profile.tag);
               },
               ),
             Divider(
@@ -387,7 +411,7 @@ class _ProductCheckOutState extends State<ProductCheckOut> {
                 ),
               title: Text("Products".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
               onTap: () {
-                Navigator.of(context).pushNamed(Product.tag);
+               // Navigator.of(context).pushNamed(Product.tag);
               },
               ),
             Divider(
@@ -402,7 +426,7 @@ class _ProductCheckOutState extends State<ProductCheckOut> {
                 ),
               title: Text("categories".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
               onTap: () {
-                Navigator.of(context).pushNamed(CategoryScreenList.tag);
+               // Navigator.of(context).pushNamed(CategoryScreenList.tag);
               },
               ),
             Divider(
@@ -445,12 +469,12 @@ class _ProductCheckOutState extends State<ProductCheckOut> {
                 ),
               title: Text("Logout".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
               onTap: () {
-                TapMessage(context, "Logout!");
+               // TapMessage(context, "Logout!");
               },
               ),
           ],
           ));
-  }
+  }*/
   //---------------------------------------------------------------------------------------------------//
   void TapMessage(BuildContext context, String message) {
     var alert = new AlertDialog(
@@ -474,7 +498,7 @@ class _ProductCheckOutState extends State<ProductCheckOut> {
     prefs.remove(Preferences.KEY_NAME);
     prefs.remove(Preferences.KEY_Email);
     prefs.remove(Preferences.KEY_Contact);
-    Navigator.of(context).pushNamed(Splash.tag);
+    //Navigator.of(context).pushNamed(Splash.tag);
   }
 }
 //-------------------------------------------------------------------------------------------//

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mdsons/CategoryScreen/CategoryScreenList.dart';
+import 'package:mdsons/ProfileDetails/PasswordEdit.dart';
 import 'package:mdsons/TotalAddCartList/TotalAddCartList.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mdsons/SplashScreen/Splash.dart';
@@ -47,36 +48,38 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   bool _status = true;
   final FocusNode myFocusNode = FocusNode();
   bool status = false;
-  bool _validate = false;
-
+  String data;
+  String ProfileName="" ;
+  String ProfileData = '';
+  String ProfileMobile;
+  String ProfileAddress = '';
+  String ProfileStatus = '';
+  String ProfileUserType = '';
 //----------------------------------------------------------------------------------------//
   // ignore: missing_return
-  Future<Null> fetchData() async {
+  Future<String> fetchData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    Userid = prefs.getString(Preferences.KEY_ID).toString();
     UserName = prefs.getString(Preferences.KEY_NAME).toString();
     UserEmail = prefs.getString(Preferences.KEY_Email).toString();
     UserContact = prefs.getString(Preferences.KEY_Contact).toString();
-    //  CountProduct = prefs.getString(Preferences.KEY_CountProduct).toString();
-    //print("UserEmail"+UserEmail);
-    //print("UserContact"+UserContact);
-    // print("KEY_CountProduct"+CountProduct);
-    /*  setState(() {
-      loading = true;
-    });
-    _list.clear();
-    final response =
-    await http.get("http://gravitinfosystems.com/MDNS/MDN_APP/MaxDiscountProduct.php");
-    if (response.statusCode == 200) {
-      final extractdata = jsonDecode(response.body);
-      data = extractdata["data"];
-      print("data"+data.toString());
-      setState(() {
-        for (Map i in data) {
-          _list.add(Posts.formJson(i));
-          loading = false;
-        }
+
+    String url = 'http://192.168.0.200/anuj/MDN/MDN_APP/ProfileDisplay.php?id='+Userid;
+    print("url"+url);
+    var response = await http
+        .get(Uri.encodeFull(url), headers: {"Accept": "application/json"});
+
+    setState(() {
+      var extractdata = json.decode(response.body);
+      ProfileData = extractdata["data"].toString();
+      print("ProfileData"+ProfileData.toString());
+      ProfileName = extractdata["data"]["Name"].toString();
+      ProfileMobile = extractdata["data"]["contact"].toString();
+      ProfileAddress = extractdata["data"]["address"].toString();
+      //print("ProfileName"+ProfileName.toString());
+      //print("ProfileMobile"+ProfileMobile.toString());
+     // print("ProfileAddress"+ProfileAddress.toString());
       });
-    }*/
   }
 
 //----------------------------------------------------------------------------------------//
@@ -102,7 +105,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Userid = prefs.getString(Preferences.KEY_ID).toString();
     String profile =
-        'http://192.168.0.200/anuj/MDN/MDN_APP/ProfileEdit.php?id=' +
+        'http://192.168.0.200/anuj/MDN/MDN_APP/ProfileEdit.php?id='+
             Userid +
             "&Name=" +
             Name +
@@ -118,14 +121,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
     var data = json.decode(res.body);
 
-    status = data['status'];
-    print("status" + status.toString());
+    print("data" + data.toString());
 
-    if (status == 1) {
-      print("status" + status.toString());
-      /*_onWillPopSuccess();
-        Navigator.of(context).pushNamed(Login.tag);*/
-    }
     setState(() {
       print("Success");
     });
@@ -161,7 +158,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          HomePage(
+                          Profile(
                           )),
                   );
               },
@@ -486,7 +483,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                       controller: NameController,
                                       keyboardType: TextInputType.text,
                                       decoration: InputDecoration(
-                                        hintText: UserName,
+                                        hintText: ProfileName,
                                         ),
                                       ),
                                     ),
@@ -564,7 +561,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                       controller: ContactController,
                                       keyboardType: TextInputType.number,
                                       decoration: InputDecoration(
-                                        hintText: UserContact,
+                                        hintText: ProfileMobile,
                                         ),
                                       ),
                                     ),
@@ -602,12 +599,43 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                       controller: AddressController,
                                       keyboardType: TextInputType.text,
                                       decoration: InputDecoration(
-                                        hintText: "Enter Your Address",
+                                        hintText: ProfileAddress,
                                         ),
                                       ),
                                     ),
                                 ],
                                 )),
+                            new
+                          Padding(
+                              padding: EdgeInsets.only(
+                                  left: 25.0, right: 25.0, top: 12.0),
+                            child: Container(
+                              height: 50,
+                              color: Color(0xFFE0318C),
+                              child: new FlatButton.icon(
+                                //color: Colors.red,
+                                icon: Icon(Icons.save, color: Colors.white,),
+                                  //`Icon` to display
+                                  label: Text('Change Password'.toUpperCase(), style: TextStyle(
+                                    fontSize: 15.0,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,)),
+                                  //`Text` to display
+                                  onPressed: () {
+                                    //print("hello"+id.toString());
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => PasswordEdit(
+                                            //value: Userid.toString(),
+                                            )),
+                                      );
+                                  },
+
+                                ),
+
+                              ),),
+
                         ],
                         ),
                       ),

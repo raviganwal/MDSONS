@@ -82,6 +82,8 @@ class _HomePageState extends State<HomePage> {
           loading = false;
         }
       });
+    } else{
+      throw Exception('Something Wrong');
     }
   }
 //---------------------------------------------------------------------------------------------------//
@@ -133,7 +135,7 @@ class _HomePageState extends State<HomePage> {
 //---------------------------------------------------------------------------------------------------//
   @override
   Widget build(BuildContext context) {
-    onWillPop: onWillPop;
+   // onWillPop: onWillPop;
     double width = MediaQuery.of(context).size.width;
     double _width = width * 0.70;
     double height = MediaQuery.of(context).size.height;
@@ -207,13 +209,13 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Column(
         children: <Widget>[
-          Container(
+        /*  Container(
             height: 150.0,
             //color: Colors.green,
             child: new Padding(
               padding: const EdgeInsets.all(4.0),
               child: new GestureDetector(
-             /*   onTap: () {
+             *//*   onTap: () {
                   setState(() {
                     _id = data;
                     ProductName = (data.toString());//if you want to assign the index somewhere to check
@@ -227,7 +229,7 @@ class _HomePageState extends State<HomePage> {
                         value1: " ${ widget.value }"),
                     );
                   Navigator.of(context).push(route);
-                },*/
+                },*//*
                   child:ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: _list.length, itemBuilder: (context, i) {
@@ -276,7 +278,7 @@ class _HomePageState extends State<HomePage> {
 
               ),
             ),
-          ),
+          ),*/
 //---------------------------------------------------------------------------------------------------//
           Expanded(
             child: new Container(
@@ -622,7 +624,7 @@ class _HomePageState extends State<HomePage> {
     showDialog(context: context, child: alert);
   }
 //---------------------------------------------------------------------------------------------------//
-  Future<bool> onWillPop(BuildContext context) async {
+  /*Future<bool> onWillPop(BuildContext context) async {
     DateTime currentTime = DateTime.now();
 
     bool backButtonHasNotBeenPressedOrSnackBarHasBeenClosed =
@@ -638,6 +640,6 @@ class _HomePageState extends State<HomePage> {
   final snackBar = SnackBar(
     content: Text('Press back again to leave'),
     duration: snackBarDuration,
-    );
+    );*/
 }
 //---------------------------------------------------------------------------------------------------//

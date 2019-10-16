@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mdsons/CategoryScreen/CategoryScreenList.dart';
+import 'package:mdsons/ProductScreen/ProductTotalCardList.dart';
 import 'package:mdsons/TotalAddCartList/TotalAddCartList.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mdsons/HomeScreen/HomePage.dart';
@@ -192,7 +193,7 @@ class _ProductState extends State<Product> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => TotalAddCartList(
+                        builder: (context) => ProductTotalCardList(
                           value: Userid.toString(),
                           )),
                     );

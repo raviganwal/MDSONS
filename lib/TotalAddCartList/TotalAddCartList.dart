@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mdsons/CategoryScreen/CategoryScreenList.dart';
 import 'package:mdsons/CheckOutScreen/CheckOut.dart';
+import 'package:mdsons/TotalAddCartList/TotalCheckOut.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mdsons/HomeScreen/HomePage.dart';
 import 'package:mdsons/TotalAddCartList/TotalCartModel.dart';
@@ -49,6 +50,11 @@ class _TotalAddCartList extends State<TotalAddCartList> {
   String ReciveTotalPrice = '';
   String imageurl = 'https://gravitinfosystems.com/MDNS/uploads/';
   final String phone = 'tel:+917000624695';
+  String GlobalProductId  = '';
+  String CardItemId  = '';
+  bool statusProductDeleted = false;
+  int statusProductAddItem = 0;
+  bool statusProductRemoveItem = false;
 
 //---------------------------------------------------------------------------------------------------//
   // ignore: missing_return
@@ -117,6 +123,194 @@ class _TotalAddCartList extends State<TotalAddCartList> {
     });
   }
 //---------------------------------------------------------------------------------------------------//
+  DeleteProductItem() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Userid = prefs.getString(Preferences.KEY_ID).toString();
+    //print("Userid"+Userid);
+    String GetDeleteProductItem =
+        'http://gravitinfosystems.com/MDNS/MDN_APP/DeleteProductFromCart.php?UserId='+Userid+"&ProductId="+GlobalProductId;
+    // print("GetCount " + GetDeleteProductItem);
+    var res =
+    await http.get(GetDeleteProductItem, headers: {"Accept": "application/json"});
+    var ProductdataDelete = json.decode(res.body);
+    statusProductDeleted = ProductdataDelete['status'];
+    //print("status" + statusProductDeleted.toString());
+    setState(() {
+      print("Success");
+    });
+  }
+//--------------------------------------------------------------------------------------------------------//
+  Future<void> _DeleteProductItemAlert() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Product Deleted.. ', textAlign: TextAlign.center,
+                        style: new TextStyle(fontSize: 15.0,
+                                                 color: Palette1.greenLandLight1,
+                                                 fontWeight: FontWeight.bold),),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Product has been deleted from your List Thanks..',
+                       textAlign: TextAlign.center,
+                       style: new TextStyle(fontSize: 12.0,
+                                                color: Palette1.greenLandLight1,
+                                                fontWeight: FontWeight.bold),),
+              ],
+              ),
+            ),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () {
+                //("hello123"+id.toString());
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => TotalAddCartList(
+                          value: Userid.toString(),
+                          value5: widget.value.toString()
+                          )),
+                  );
+              },
+              child: Text('OK', style: new TextStyle(fontSize: 15.0,
+                                                         color: Palette1
+                                                             .greenLandLight1,
+                                                         fontWeight: FontWeight
+                                                             .bold),),
+              )
+          ],
+          );
+      },
+      );
+  }
+//---------------------------------------------------------------------------------------------------//
+  AddProductCount() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Userid = prefs.getString(Preferences.KEY_ID).toString();
+    //print("Userid"+Userid);
+    String GetAddProductCount =
+        'http://gravitinfosystems.com/MDNS/MDN_APP/Cart.php?UserId='+Userid+"&ProductId="+GlobalProductId;
+    var res =
+    await http.get(GetAddProductCount, headers: {"Accept": "application/json"});
+    var dataAddItem = json.decode(res.body);
+    statusProductAddItem = dataAddItem['status'];
+    print("status" + statusProductAddItem.toString());
+    setState(() {
+      print("Success");
+    });
+  }
+//--------------------------------------------------------------------------------------------------------//
+  Future<void> _AddProductItemAlert() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Product Added.. ', textAlign: TextAlign.center,
+                        style: new TextStyle(fontSize: 15.0,
+                                                 color: Palette1.greenLandLight1,
+                                                 fontWeight: FontWeight.bold),),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Product has been Added From Your List Thanks..',
+                       textAlign: TextAlign.center,
+                       style: new TextStyle(fontSize: 12.0,
+                                                color: Palette1.greenLandLight1,
+                                                fontWeight: FontWeight.bold),),
+              ],
+              ),
+            ),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () {
+                //("hello123"+id.toString());
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => TotalAddCartList(
+                          value: Userid.toString(),
+                          value5: widget.value.toString()
+                          )),
+                  );
+              },
+              child: Text('OK', style: new TextStyle(fontSize: 15.0,
+                                                         color: Palette1
+                                                             .greenLandLight1,
+                                                         fontWeight: FontWeight
+                                                             .bold),),
+              )
+          ],
+          );
+      },
+      );
+  }
+//---------------------------------------------------------------------------------------------------//
+  RemoveProductCount() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Userid = prefs.getString(Preferences.KEY_ID).toString();
+    //print("Userid"+Userid);
+    String GetRemoveCount =
+        'http://gravitinfosystems.com/MDNS/MDN_APP/RemoveSingleCartItem.php?CartId='+CardItemId;
+    // print("GetRemoveCount " + GetRemoveCount);
+    var res =
+    await http.get(GetRemoveCount, headers: {"Accept": "application/json"});
+    var dataRemoveItem = json.decode(res.body);
+    statusProductRemoveItem = dataRemoveItem['status'];
+    print("status" + statusProductRemoveItem.toString());
+    setState(() {
+      print("Success");
+    });
+  }
+//--------------------------------------------------------------------------------------------------------//
+  Future<void> _RemoveProductItemAlert() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Product Removed.. ', textAlign: TextAlign.center,
+                        style: new TextStyle(fontSize: 15.0,
+                                                 color: Palette1.greenLandLight1,
+                                                 fontWeight: FontWeight.bold),),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Product has been Removeded From Your List Thanks..',
+                       textAlign: TextAlign.center,
+                       style: new TextStyle(fontSize: 12.0,
+                                                color: Palette1.greenLandLight1,
+                                                fontWeight: FontWeight.bold),),
+              ],
+              ),
+            ),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () {
+                //("hello123"+id.toString());
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => TotalAddCartList(
+                          value: Userid.toString(),
+                          value5: widget.value.toString()
+                          )),
+                  );
+              },
+              child: Text('OK', style: new TextStyle(fontSize: 15.0,
+                                                         color: Palette1
+                                                             .greenLandLight1,
+                                                         fontWeight: FontWeight
+                                                             .bold),),
+              )
+          ],
+          );
+      },
+      );
+  }
+//---------------------------------------------------------------------------------------------------//
   @override
   void initState() {
     this.getProductCount();
@@ -163,6 +357,8 @@ class _TotalAddCartList extends State<TotalAddCartList> {
               itemBuilder: (context, i) {
                 categoryid = data[i]["categoryid"];
                 final a = _list[i];
+                GlobalProductId = a.userId.toString();
+                CardItemId = a.id.toString();
                 return new Container(
                   color: Colors.white54,
                   child: new GestureDetector(
@@ -190,7 +386,7 @@ class _TotalAddCartList extends State<TotalAddCartList> {
                             decoration: BoxDecoration(
                               image: DecorationImage(
                                 image: NetworkImage(imageurl+a.image),
-                                fit: BoxFit.cover,
+                                fit: BoxFit.contain,
                                 ),
                               borderRadius: BorderRadius.all(Radius.circular(5)),
                               ),
@@ -206,10 +402,10 @@ class _TotalAddCartList extends State<TotalAddCartList> {
                                     a.productname,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
                                       color:Color(0xFF222B78),
-                                        ),
+                                      ),
                                     ),
                                   SizedBox(
                                     height: 10,
@@ -217,36 +413,36 @@ class _TotalAddCartList extends State<TotalAddCartList> {
                                   Text(
                                     "Total Add Item ${a.count}",
                                     style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 12,
                                       color:Color(0xFF222B78),
-                                        ),
+                                      ),
                                     ),
                                   SizedBox(
-                                     height: 5,
+                                    height: 5,
                                     ),
                                   Row(
                                     children: <Widget>[
                                       Expanded(
                                         child: Text(
-                                          "MRP ${a.mrp}",
+                                          "SellingPrice ${a.SellingPrice}",
                                           style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12,
                                             color:Color(0xFF222B78),
-                                              ),
+                                            ),
                                           ),
                                         ),
                                       Icon(
                                         FontAwesomeIcons.rupeeSign,
                                         size: 18,
-                                          color:Color(0xFF222B78),
-                                        ),
-                                      new Text(a.QtyMRP.toString(), style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 18,
                                         color:Color(0xFF222B78),
-                                          ),
+                                        ),
+                                      new Text(a.Discost.toString(), style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 18,
+                                        color:Color(0xFF222B78),
+                                        ),
                                                ),
                                       SizedBox(
                                         width: 5,
@@ -278,33 +474,57 @@ class _TotalAddCartList extends State<TotalAddCartList> {
                                         color:Color(0xFFE0318C),
                                         child: IconButton(
                                           icon: Icon(Icons.remove,color: Colors.white,),
-                                          /* onPressed: () {
-                                            model.updateProduct(model.cart[index],
-                                                                    model.cart[index].qty + 1);
+                                          onPressed: () {
+                                            setState(() {
+
+                                              CardItemId = (data[i][
+                                              "Id"]);
+                                              //if you want to assign the index somewhere to check
+                                              //print("OnTapProductId"+GlobalProductId.toString());
+                                            });
+                                            RemoveProductCount();
+                                            _RemoveProductItemAlert();
+                                            //print("hello");
                                             // model.removeProduct(model.cart[index]);
-                                          },*/
+                                          },
                                           ),
                                         ),
                                       Container(
                                         color:Color(0xFFE0318C),
                                         child: IconButton(
                                           icon: Icon(Icons.add,color: Colors.white,),
-                                          /* onPressed: () {
-                                            model.updateProduct(model.cart[index],
-                                                                    model.cart[index].qty + 1);
+                                          onPressed: () {
+                                            setState(() {
+
+                                              GlobalProductId = (data[i][
+                                              "product_id"]);
+                                              //if you want to assign the index somewhere to check
+                                              // print("OnTapProductId"+GlobalProductId.toString());
+                                            });
+                                            AddProductCount();
+                                            _AddProductItemAlert();
+                                            //print("hello");
                                             // model.removeProduct(model.cart[index]);
-                                          },*/
+                                          },
                                           ),
                                         ),
                                       Container(
                                         color:Color(0xFFE0318C),
                                         child: IconButton(
                                           icon: Icon(Icons.delete,color: Colors.white,),
-                                          /* onPressed: () {
-                                            model.updateProduct(model.cart[index],
-                                                                    model.cart[index].qty + 1);
+                                          onPressed: () {
+                                            setState(() {
+
+                                              GlobalProductId = (data[i][
+                                              "product_id"]);
+                                              //if you want to assign the index somewhere to check
+                                              // print("OnTapProductId"+GlobalProductId.toString());
+                                            });
+                                            DeleteProductItem();
+                                            _DeleteProductItemAlert();
+                                            //print("hello");
                                             // model.removeProduct(model.cart[index]);
-                                          },*/
+                                          },
                                           ),
                                         ),
                                       /*SizedBox(
@@ -358,7 +578,16 @@ class _TotalAddCartList extends State<TotalAddCartList> {
                     Icons.shopping_cart,
                     color: Colors.white,
                     ),
-                  onPressed: null,
+                  onPressed: () {
+                    //print("hello"+id.toString());
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => TotalAddCartList(
+                            value: Userid.toString(),
+                            )),
+                      );
+                  },
                   ),
                 new Positioned(
                     child: new Stack(
@@ -415,14 +644,18 @@ class _TotalAddCartList extends State<TotalAddCartList> {
                   color:Color(0xFFE0318C),
                   child: new FlatButton.icon(
                     //color: Colors.red,
-                    icon: Icon( FontAwesomeIcons.creditCard,
+                    icon: Icon( FontAwesomeIcons.shoppingCart,
                                   size: 18,
                                   color: Colors.white,), //`Icon` to display
-                      label: Text('Check Out'.toUpperCase(),style: TextStyle(fontSize: 15.0, color: Colors.white,fontWeight: FontWeight.bold,)), //`Text` to display
-                onPressed: () {
-                     Navigator
-                         .of(context)
-                         .push(new MaterialPageRoute(builder: (_) => new CheckOut()));
+                      label: Text('continue'.toUpperCase(),style: TextStyle(fontSize: 15.0, color: Colors.white,fontWeight: FontWeight.bold,)), //`Text` to display
+                      onPressed: () {
+                        var route = new MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                          new TotalCheckOut(
+                            value7: ReciveTotalPrice.toString(),
+                            value8: CardItemId.toString(),),
+                          );
+                        Navigator.of(context).push(route);
                       },
                     ),
 

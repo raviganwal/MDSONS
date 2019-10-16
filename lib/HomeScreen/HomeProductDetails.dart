@@ -66,7 +66,7 @@ class _MonthSelection extends State<HomeProductDetails> {
     String url = 'http://gravitinfosystems.com/MDNS/MDN_APP/singleproduct.php?product_id='+widget.value.toString();
     final response =
     await http.get(url);
-    print("url"+url);
+    //print("url"+url);
     if (response.statusCode == 200) {
       var extractdata = jsonDecode(response.body);
       data = extractdata["data"];
@@ -106,12 +106,11 @@ class _MonthSelection extends State<HomeProductDetails> {
     //print("Userid"+Userid);
     String GetCount =
         'http://gravitinfosystems.com/MDNS/MDN_APP/forcount.php?UserId='+Userid;
-    //print("GetCount " + GetCount);
     var res =
     await http.get(GetCount, headers: {"Accept": "application/json"});
     var dataLogin = json.decode(res.body);
     // print("ReciveData"+dataLogin.toString());
-    ReciveCount = dataLogin["count"].toString();
+    RecivedCount = dataLogin["count"].toString();
     // print("GetCountFromServer"+ReciveCount);
     setState(() {
       //print("Success");
@@ -430,16 +429,16 @@ class _MonthSelection extends State<HomeProductDetails> {
                   Icons.shopping_cart,
                   color: Colors.white,
                 ),
-                /*onPressed: () {
+                onPressed: () {
                   //print("hello"+id.toString());
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => TotalAddCartList(
+                        builder: (context) => HomeTotalAddList(
                           value: id.toString(),
                           )),
                     );
-                },*/
+                },
               ),
               new Positioned(
                   child: new Stack(

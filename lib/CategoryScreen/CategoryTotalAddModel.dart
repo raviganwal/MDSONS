@@ -13,9 +13,10 @@ class Posts {
   final String description;
   final String brand;
   final String count;
+  final int Discost;
   // final String TotalAmount;
 
-  Posts({this.userId, this.id, this.productname, this.SellingPrice,this.image,this.MRP,this.howtouse,this.mrp,this.Discount,this.productnumber,this.description,this.brand,this.count,this.QtyMRP});
+  Posts({this.userId, this.id, this.productname, this.SellingPrice,this.image,this.MRP,this.howtouse,this.mrp,this.Discount,this.productnumber,this.description,this.brand,this.count,this.QtyMRP,this.Discost});
 
 
   factory Posts.formJson(Map <String, dynamic> json){
@@ -34,6 +35,7 @@ class Posts {
       description: json['description'],
       brand: json['brand'],
       count: json['count(Cart.ProductId)'],
+      Discost: json['Discost'],
       //TotalAmount: json['total'],
       );
   }

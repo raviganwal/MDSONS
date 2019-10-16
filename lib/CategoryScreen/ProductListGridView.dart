@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mdsons/CategoryScreen/CategoryScreenList.dart';
 import 'package:mdsons/CategoryScreen/CategoryProductGridViewDetails.dart';
+import 'package:mdsons/CategoryScreen/CategoryTotalAddList.dart';
 import 'package:mdsons/CategoryScreen/SubCategoryList.dart';
 import 'package:mdsons/CategoryScreen/model.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -110,9 +111,9 @@ class HomePageState extends State<ProductListGridView> {
     });
   }
 //-------------------------------------------------------------------------------------//
-  Future<Null> BackScreen() async {
+  /*Future<Null> BackScreen() async {
     Navigator.of(context).pushNamed(CategoryScreenList.tag);
-  }
+  }*/
 //-------------------------------------------------------------------------------------//
   @override
   void initState() {
@@ -133,9 +134,9 @@ class HomePageState extends State<ProductListGridView> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double _width = width * 0.70;
-    return new WillPopScope(
-        onWillPop: BackScreen,
-    child: Scaffold(
+   /* return new WillPopScope(
+        onWillPop: BackScreen*/
+        return Scaffold(
       drawer:  _drawer(),
       backgroundColor: Colors.grey[100],
       appBar: new AppBar(
@@ -175,7 +176,16 @@ class HomePageState extends State<ProductListGridView> {
                   Icons.shopping_cart,
                   color: Colors.white,
                 ),
-                onPressed: null,
+                onPressed: () {
+                  //print("hello"+id.toString());
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => CategoryTotalAddList(
+                          value: Userid.toString(),
+                          )),
+                    );
+                },
               ),
               new Positioned(
                   child: new Stack(
@@ -457,8 +467,8 @@ class HomePageState extends State<ProductListGridView> {
           ],
         ),
       ),
-    ),
     );
+
   }
 //-------------------------------------------------------------------------------------//
   Widget _drawer() {
