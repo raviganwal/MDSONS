@@ -146,9 +146,7 @@ class _NextPage extends State<CategoryScreenList> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    double _width = width * 0.70;
     double height = MediaQuery.of(context).size.height;
-    double _height = height * 0.85;
     final listJson =  new Container(
       child: Column(
         children: <Widget>[

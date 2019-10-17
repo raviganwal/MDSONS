@@ -90,7 +90,7 @@ class _LoginState extends State<Login>
               "&UserType=" +
               aa;
 
-     // print("URL " + profile);
+      // print("URL " + profile);
 
       var res =
       await http.get(profile, headers: {"Accept": "application/json"});
@@ -102,7 +102,7 @@ class _LoginState extends State<Login>
 
       if (status == 1) {
         _onWillPopSuccess();
-          Navigator.of(context).pushNamed(Login.tag);
+        Navigator.of(context).pushNamed(Login.tag);
 
       } else {
         _showOnTapMessage(context, "incorrect");
@@ -128,16 +128,16 @@ class _LoginState extends State<Login>
       String profile =
           'http://gravitinfosystems.com/MDNS/MDN_APP/login.php?Email='+email+"&Password="+password;
 
-      //print("URLLogin " + profile);
+      print("URLLogin " + profile);
 
       var res =
       await http.get(profile, headers: {"Accept": "application/json"});
 
       var dataLogin = json.decode(res.body);
-      //print("ReciveData"+dataLogin.toString());
+      print("ReciveData"+dataLogin.toString());
 
       statuslogin = dataLogin['data']['0'.toString()];
-      //print("ReciveLoginstatus"+statuslogin.toString());
+      print("ReciveLoginstatus"+statuslogin.toString());
 
       msg = dataLogin['data']['1'];
       statuslogin = dataLogin['data']['0'];
@@ -146,10 +146,10 @@ class _LoginState extends State<Login>
       name = dataLogin['data']['Name'];
       UserEmail = dataLogin['data']['Email'];
       UserContact = dataLogin['data']['contact'];
-    //  Count_Product = dataLogin['data']['Count_product'];
-     // print(UserEmail);
-     // print(UserContact);
-     // print(Count_Product);
+      //  Count_Product = dataLogin['data']['Count_product'];
+      // print(UserEmail);
+      // print(UserContact);
+      // print(Count_Product);
 
       if (statuslogin == 1) {
         if (role == 'Individual') {
@@ -167,12 +167,12 @@ class _LoginState extends State<Login>
       }
 
       setState(() {
-        //print("Success");
-       // print(id);
-       // print(role);
-      //  print(statuslogin);
-      //  print(msg);
-      //  print(name);
+        print("Success");
+        // print(id);
+        // print(role);
+        //  print(statuslogin);
+        //  print(msg);
+        //  print(name);
       });
     }
   }
@@ -188,7 +188,7 @@ class _LoginState extends State<Login>
             },
             child: new Text('OK'))
       ],
-    );
+      );
     showDialog(context: context, builder: (_) => alert);
   }
 
@@ -217,14 +217,14 @@ class _LoginState extends State<Login>
           new FlatButton(
             onPressed: () => Navigator.of(context).pop(false),
             child: new Text('No'),
-          ),
+            ),
           new FlatButton(
             onPressed: () => exit(0),
             child: new Text('Yes'),
-          ),
+            ),
         ],
-      ),
-    ) ??
+        ),
+      ) ??
         false;
   }
 
@@ -238,14 +238,14 @@ class _LoginState extends State<Login>
           new FlatButton(
             onPressed: () => Navigator.of(context).pushNamed(Login.tag),
             child: new Text('No'),
-          ),
+            ),
           new FlatButton(
             onPressed: () => exit(0),
             child: new Text('Yes'),
-          ),
+            ),
         ],
-      ),
-    ) ??
+        ),
+      ) ??
         false;
   }
 
@@ -276,7 +276,7 @@ class _LoginState extends State<Login>
                   end: const FractionalOffset(1.0, 1.0),
                   stops: [0.0, 1.0],
                   tileMode: TileMode.clamp),
-            ),
+              ),
             child: Column(
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
@@ -287,11 +287,11 @@ class _LoginState extends State<Login>
                       height: 191.0,
                       fit: BoxFit.fill,
                       image: new AssetImage('assets/images/login_logo.png')),
-                ),
+                  ),
                 Padding(
                   padding: EdgeInsets.only(top: 20.0),
                   child: _buildMenuBar(context),
-                ),
+                  ),
                 Expanded(
                   flex: 2,
                   child: PageView(
@@ -313,20 +313,20 @@ class _LoginState extends State<Login>
                       new ConstrainedBox(
                         constraints: const BoxConstraints.expand(),
                         child: _buildSignIn(context),
-                      ),
+                        ),
                       new ConstrainedBox(
                         constraints: const BoxConstraints.expand(),
                         child: _buildSignUp(context),
-                      ),
+                        ),
                     ],
+                    ),
                   ),
-                ),
               ],
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 
   @override
@@ -341,11 +341,11 @@ class _LoginState extends State<Login>
   @override
   void initState() {
     super.initState();
-   // onResume:
+    // onResume:
     SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
+                                            DeviceOrientation.portraitUp,
+                                            DeviceOrientation.portraitDown,
+                                          ]);
     _pageController = PageController();
     _dropdownMenuItems = buildDropdownMenuItems(_companies);
     _selectedCompany = _dropdownMenuItems[0].value;
@@ -378,10 +378,10 @@ class _LoginState extends State<Login>
             color: Colors.white,
             fontSize: 16.0,
             fontFamily: "WorkSansSemiBold"),
-      ),
+        ),
       backgroundColor: Colors.blue,
       duration: Duration(seconds: 3),
-    ));
+      ));
   }
 
   Widget _buildMenuBar(BuildContext context) {
@@ -391,7 +391,7 @@ class _LoginState extends State<Login>
       decoration: BoxDecoration(
         color: Color(0x552B2B2B),
         borderRadius: BorderRadius.all(Radius.circular(25.0)),
-      ),
+        ),
       child: CustomPaint(
         painter: TabIndicationPainter(pageController: _pageController),
         child: Row(
@@ -408,9 +408,9 @@ class _LoginState extends State<Login>
                       color: left,
                       fontSize: 16.0,
                       fontFamily: "WorkSansSemiBold"),
+                  ),
                 ),
               ),
-            ),
             //Container(height: 33.0, width: 1.0, color: Colors.white),
             Expanded(
               child: FlatButton(
@@ -423,13 +423,13 @@ class _LoginState extends State<Login>
                       color: right,
                       fontSize: 16.0,
                       fontFamily: "WorkSansSemiBold"),
+                  ),
                 ),
               ),
-            ),
           ],
+          ),
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildSignIn(BuildContext context) {
@@ -448,7 +448,7 @@ class _LoginState extends State<Login>
                 color: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.0),
-                ),
+                  ),
                 child: Container(
                   width: 300.0,
                   height: 190.0,
@@ -461,7 +461,7 @@ class _LoginState extends State<Login>
                           focusNode: myFocusNodeEmailLogin,
                           controller: loginEmailController,
                           keyboardType: TextInputType.emailAddress,
-                         // validator: validateEmail,
+                          // validator: validateEmail,
                           style: TextStyle(
                               fontFamily: "WorkSansSemiBold",
                               fontSize: 16.0,
@@ -472,18 +472,18 @@ class _LoginState extends State<Login>
                               FontAwesomeIcons.envelope,
                               color: Colors.black,
                               size: 22.0,
-                            ),
+                              ),
                             hintText: "Email Address",
                             hintStyle: TextStyle(
                                 fontFamily: "WorkSansSemiBold", fontSize: 17.0),
+                            ),
                           ),
                         ),
-                      ),
                       Container(
                         width: 250.0,
                         height: 1.0,
                         color: Colors.grey[400],
-                      ),
+                        ),
                       Padding(
                         padding: EdgeInsets.only(
                             top: 20.0, bottom: 20.0, left: 25.0, right: 25.0),
@@ -501,7 +501,7 @@ class _LoginState extends State<Login>
                               FontAwesomeIcons.lock,
                               size: 22.0,
                               color: Colors.black,
-                            ),
+                              ),
                             hintText: "Password",
                             hintStyle: TextStyle(
                                 fontFamily: "WorkSansSemiBold", fontSize: 17.0),
@@ -513,15 +513,15 @@ class _LoginState extends State<Login>
                                     : FontAwesomeIcons.eyeSlash,
                                 size: 15.0,
                                 color: Colors.black,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
                     ],
+                    ),
                   ),
                 ),
-              ),
               Container(
                 margin: EdgeInsets.only(top: 170.0),
                 decoration: new BoxDecoration(
@@ -531,12 +531,12 @@ class _LoginState extends State<Login>
                       color: Theme.Colors.loginGradientStart,
                       offset: Offset(1.0, 6.0),
                       blurRadius: 20.0,
-                    ),
+                      ),
                     BoxShadow(
                       color: Theme.Colors.loginGradientEnd,
                       offset: Offset(1.0, 6.0),
                       blurRadius: 20.0,
-                    ),
+                      ),
                   ],
                   gradient: new LinearGradient(
                       colors: [
@@ -547,7 +547,7 @@ class _LoginState extends State<Login>
                       end: const FractionalOffset(1.0, 1.0),
                       stops: [0.0, 1.0],
                       tileMode: TileMode.clamp),
-                ),
+                  ),
                 child: MaterialButton(
                   highlightColor: Colors.transparent,
                   splashColor: Theme.Colors.loginGradientEnd,
@@ -561,14 +561,14 @@ class _LoginState extends State<Login>
                           color: Colors.white,
                           fontSize: 25.0,
                           fontFamily: "WorkSansBold"),
+                      ),
                     ),
-                  ),
                   onPressed: () =>
                       getDataLogin(loginEmailController.text, loginPasswordController.text),
+                  ),
                 ),
-              ),
             ],
-          ),
+            ),
           /*Padding(
             padding: EdgeInsets.only(top: 10.0),
             child: FlatButton(
@@ -583,8 +583,8 @@ class _LoginState extends State<Login>
                 )),
           ),*/
         ],
-      ),
-    );
+        ),
+      );
   }
 
   Widget _buildSignUp(BuildContext context) {
@@ -602,7 +602,7 @@ class _LoginState extends State<Login>
                 color: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.0),
-                ),
+                  ),
                 child: Container(
                   width: 300.0,
                   //height: 600.0,
@@ -639,18 +639,18 @@ class _LoginState extends State<Login>
                             icon: Icon(
                               FontAwesomeIcons.user,
                               color: Colors.black,
-                            ),
+                              ),
                             hintText: "Name",
                             hintStyle: TextStyle(
                                 fontFamily: "WorkSansSemiBold", fontSize: 16.0),
+                            ),
                           ),
                         ),
-                      ),
                       Container(
                         width: 250.0,
                         height: 1.0,
                         color: Colors.grey[400],
-                      ),
+                        ),
                       Padding(
                         padding: EdgeInsets.only(
                             top: 10.0, bottom: 1.0, left: 25.0, right: 25.0),
@@ -667,56 +667,18 @@ class _LoginState extends State<Login>
                             icon: Icon(
                               FontAwesomeIcons.envelope,
                               color: Colors.black,
-                            ),
+                              ),
                             hintText: "Email Address",
                             hintStyle: TextStyle(
                                 fontFamily: "WorkSansSemiBold", fontSize: 16.0),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 250.0,
-                        height: 1.0,
-                        color: Colors.grey[400],
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(
-                            top: 10.0, bottom: 1.0, left: 25.0, right: 25.0),
-                        child: TextField(
-                          focusNode: myFocusNodePassword,
-                          controller: signupPasswordController,
-                         // obscureText: _obscureTextSignup,
-                          style: TextStyle(
-                              fontFamily: "WorkSansSemiBold",
-                              fontSize: 16.0,
-                              color: Colors.black),
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            icon: Icon(
-                              FontAwesomeIcons.lock,
-                              color: Colors.black,
                             ),
-                            hintText: "Password",
-                            hintStyle: TextStyle(
-                                fontFamily: "WorkSansSemiBold", fontSize: 16.0),
-                            /*suffixIcon: GestureDetector(
-                              onTap: _toggleSignup,
-                              child: Icon(
-                                _obscureTextSignup
-                                    ? FontAwesomeIcons.eye
-                                    : FontAwesomeIcons.eyeSlash,
-                                size: 15.0,
-                                color: Colors.black,
-                              ),
-                            ),*/
                           ),
                         ),
-                      ),
                       Container(
                         width: 250.0,
                         height: 1.0,
                         color: Colors.grey[400],
-                      ),
+                        ),
                       Padding(
                         padding: EdgeInsets.only(
                             top: 10.0, bottom: 1.0, left: 25.0, right: 25.0),
@@ -733,7 +695,45 @@ class _LoginState extends State<Login>
                             icon: Icon(
                               FontAwesomeIcons.lock,
                               color: Colors.black,
+                              ),
+                            hintText: "Password",
+                            hintStyle: TextStyle(
+                                fontFamily: "WorkSansSemiBold", fontSize: 16.0),
+                            /*suffixIcon: GestureDetector(
+                              onTap: _toggleSignup,
+                              child: Icon(
+                                _obscureTextSignup
+                                    ? FontAwesomeIcons.eye
+                                    : FontAwesomeIcons.eyeSlash,
+                                size: 15.0,
+                                color: Colors.black,
+                              ),
+                            ),*/
                             ),
+                          ),
+                        ),
+                      Container(
+                        width: 250.0,
+                        height: 1.0,
+                        color: Colors.grey[400],
+                        ),
+                      Padding(
+                        padding: EdgeInsets.only(
+                            top: 10.0, bottom: 1.0, left: 25.0, right: 25.0),
+                        child: TextField(
+                          focusNode: myFocusNodePassword,
+                          controller: signupPasswordController,
+                          // obscureText: _obscureTextSignup,
+                          style: TextStyle(
+                              fontFamily: "WorkSansSemiBold",
+                              fontSize: 16.0,
+                              color: Colors.black),
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            icon: Icon(
+                              FontAwesomeIcons.lock,
+                              color: Colors.black,
+                              ),
                             hintText: "Confirm Password",
                             hintStyle: TextStyle(
                                 fontFamily: "WorkSansSemiBold", fontSize: 16.0),
@@ -747,14 +747,14 @@ class _LoginState extends State<Login>
                                 color: Colors.black,
                               ),
                             ),*/
+                            ),
                           ),
                         ),
-                      ),
                       Container(
                         width: 250.0,
                         height: 1.0,
                         color: Colors.grey[400],
-                      ),
+                        ),
                       Padding(
                         padding: EdgeInsets.only(
                             top: 10.0, bottom: 1.0, left: 25.0, right: 25.0),
@@ -773,17 +773,17 @@ class _LoginState extends State<Login>
                             icon: Icon(
                               FontAwesomeIcons.user,
                               color: Colors.black,
-                            ),
+                              ),
                             hintText: "Mobile No",
                             hintStyle: TextStyle(
                                 fontFamily: "WorkSansSemiBold", fontSize: 16.0),
+                            ),
                           ),
                         ),
-                      ),
                     ],
+                    ),
                   ),
                 ),
-              ),
               Container(
                 margin: EdgeInsets.only(top: 350.0),
                 decoration: new BoxDecoration(
@@ -793,12 +793,12 @@ class _LoginState extends State<Login>
                       color: Theme.Colors.loginGradientStart,
                       offset: Offset(1.0, 6.0),
                       blurRadius: 20.0,
-                    ),
+                      ),
                     BoxShadow(
                       color: Theme.Colors.loginGradientEnd,
                       offset: Offset(1.0, 6.0),
                       blurRadius: 20.0,
-                    ),
+                      ),
                   ],
                   gradient: new LinearGradient(
                       colors: [
@@ -809,42 +809,42 @@ class _LoginState extends State<Login>
                       end: const FractionalOffset(1.0, 1.0),
                       stops: [0.0, 1.0],
                       tileMode: TileMode.clamp),
-                ),
+                  ),
                 child: MaterialButton(
-                    highlightColor: Colors.transparent,
-                    splashColor: Theme.Colors.loginGradientEnd,
-                    //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10.0, horizontal: 42.0),
-                      child: Text(
-                        "SIGN UP",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 25.0,
-                            fontFamily: "WorkSansBold"),
+                  highlightColor: Colors.transparent,
+                  splashColor: Theme.Colors.loginGradientEnd,
+                  //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10.0, horizontal: 42.0),
+                    child: Text(
+                      "SIGN UP",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 25.0,
+                          fontFamily: "WorkSansBold"),
                       ),
                     ),
-                    onPressed: () =>
-                        //showInSnackBar("Login button pressed")
-                    getData(signupNameController.text, signupEmailController.text,signupPasswordController.text,signupMobilewController.text),
+                  onPressed: () =>
+                  //showInSnackBar("Login button pressed")
+                  getData(signupNameController.text, signupEmailController.text,signupPasswordController.text,signupMobilewController.text),
+                  ),
                 ),
-              ),
             ],
-          ),
+            ),
         ],
-      ),
-    );
+        ),
+      );
   }
 
   void _onSignInButtonPress() {
     _pageController.animateToPage(0,
-        duration: Duration(milliseconds: 500), curve: Curves.decelerate);
+                                      duration: Duration(milliseconds: 500), curve: Curves.decelerate);
   }
 
   void _onSignUpButtonPress() {
     _pageController?.animateToPage(1,
-        duration: Duration(milliseconds: 500), curve: Curves.decelerate);
+                                       duration: Duration(milliseconds: 500), curve: Curves.decelerate);
   }
 
   void _toggleLogin() {

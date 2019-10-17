@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/gestures.dart' show DragStartBehavior;
+import 'package:mdsons/MyOrderScreen/MyOrder.dart';
 import 'package:mdsons/TotalAddCartList/TotalAddCartList.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mdsons/Preferences/Preferences.dart';
@@ -446,7 +447,7 @@ class TextFormFieldDemoState extends State<PasswordEdit> {
                     color: Colors.black,
                     fontWeight: FontWeight.w500),),
                 onTap: () {
-                  // Navigator.of(context).pushNamed(CategoryScreenList.tag);
+                  Navigator.of(context).pushNamed(MyOrder.tag);
                 },
                 ),
               Divider(

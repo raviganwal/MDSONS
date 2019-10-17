@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mdsons/CategoryScreen/CategoryScreenList.dart';
+import 'package:mdsons/MyOrderScreen/MyOrder.dart';
 import 'package:mdsons/TotalAddCartList/TotalAddCartList.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mdsons/HomeScreen/HomeProductDetails.dart';
@@ -187,7 +188,7 @@ class _HomePageState extends State<HomePage> {
           style: TextStyle(
               fontSize: 18.0, color: Colors.white,fontWeight: FontWeight.bold),
             ),
-            Text("Welcome Mr."
+            Text("Mr "
                 +ProfileName.toUpperCase(),textAlign: TextAlign.center,
         style: TextStyle(
             fontSize: 15.0, color: Colors.white,fontWeight: FontWeight.bold),
@@ -602,7 +603,7 @@ class _HomePageState extends State<HomePage> {
               ),
               title: Text("MyOrder".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
               onTap: () {
-               // Navigator.of(context).pushNamed(HomeCartProductList.tag);
+              Navigator.of(context).pushNamed(MyOrder.tag);
               },
             ),
             Divider(

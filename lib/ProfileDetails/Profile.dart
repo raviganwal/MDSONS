@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mdsons/CategoryScreen/CategoryScreenList.dart';
+import 'package:mdsons/MyOrderScreen/MyOrder.dart';
 import 'package:mdsons/ProfileDetails/PasswordEdit.dart';
 import 'package:mdsons/TotalAddCartList/TotalAddCartList.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -62,7 +63,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     UserEmail = prefs.getString(Preferences.KEY_Email).toString();
     UserContact = prefs.getString(Preferences.KEY_Contact).toString();
 
-    String url = 'http://192.168.0.200/anuj/MDN/MDN_APP/ProfileDisplay.php?id='+Userid;
+    String url = 'http://gravitinfosystems.com/MDNS/MDN_APP/ProfileDisplay.php?id='+Userid;
     print("url"+url);
     var response = await http
         .get(Uri.encodeFull(url), headers: {"Accept": "application/json"});
@@ -363,7 +364,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       color: Colors.black,
                       fontWeight: FontWeight.w500),),
                   onTap: () {
-                    // Navigator.of(context).pushNamed(CategoryScreenList.tag);
+                    Navigator.of(context).pushNamed(MyOrder.tag);
                   },
                   ),
                 Divider(

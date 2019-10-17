@@ -32,6 +32,8 @@ dependencies:
   url_launcher: ^4.1.0
   image_picker: ^0.6.1+4
   image_cropper: ^1.1.0
+  image: ^2.1.4
+  animated_text_kit: ^1.1.0
 
 
 

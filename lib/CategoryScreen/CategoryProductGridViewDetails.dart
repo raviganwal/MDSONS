@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mdsons/CategoryScreen/CategoryTotalAddList.dart';
-import 'package:mdsons/TotalAddCartList/TotalAddCartList.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mdsons/HomeScreen/HomePage.dart';
 import 'package:mdsons/ProductScreen/Model.dart';
@@ -35,7 +34,6 @@ class _MonthSelection extends State<ProductGridViewDetails> {
   String imageurl = 'https://gravitinfosystems.com/MDNS/uploads/';
   List data;
   List<Posts> _list = [];
-  List<Posts> _search = [];
   var loading = false;
   String id;
   String StoreProductId= "";

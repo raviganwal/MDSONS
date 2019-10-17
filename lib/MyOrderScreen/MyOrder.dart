@@ -1,15 +1,15 @@
+
 import "package:flutter/material.dart";
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mdsons/CategoryScreen/CategoryScreenList.dart';
-import 'package:mdsons/CheckOutScreen/CheckOut.dart';
-import 'package:mdsons/HomeScreen/HomeCheckOut.dart';
-import 'package:mdsons/HomeScreen/HomeProductDetails.dart';
-import 'package:mdsons/MyOrderScreen/MyOrder.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:mdsons/TotalAddCartList/TotalAddCartList.dart';
+import 'package:mdsons/TotalAddCartList/TotalCheckOut.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mdsons/HomeScreen/HomePage.dart';
-import 'package:mdsons/HomeScreen/HomeTotalCartModel.dart';
+import 'package:mdsons/MyOrderScreen/MyOrderModel.dart';
 import 'package:mdsons/ProductScreen/Product.dart';
 import 'package:mdsons/ProfileDetails/Profile.dart';
 import 'package:mdsons/SplashScreen/Splash.dart';
@@ -24,19 +24,19 @@ class Palette2 {
   static Color greenLandLight2 = Color(0xFFE0318C);
 }
 //---------------------------------------------------------------------------------------------------//
-class HomeTotalAddList extends StatefulWidget {
+class MyOrder extends StatefulWidget {
 
-  static String tag = 'HomeTotalAddList';
+  static String tag = 'MyOrder';
   final String value;
   final String value4;
   final String value5;
 //---------------------------------------------------------------------------------------------------//
-  HomeTotalAddList({Key key, this.value, this.value4, this.value5}) : super(key: key);
+  MyOrder({Key key, this.value, this.value4, this.value5}) : super(key: key);
   @override
-  _HomeTotalAddList createState() => new _HomeTotalAddList();
+  _MyOrderList createState() => new _MyOrderList();
 }
 //---------------------------------------------------------------------------------------------------//
-class _HomeTotalAddList extends State<HomeTotalAddList> {
+class _MyOrderList extends State<MyOrder> {
   List data;
   List data1;
   String categoryid;
@@ -49,12 +49,11 @@ class _HomeTotalAddList extends State<HomeTotalAddList> {
   String CountProduct = '';
   String Userid = '';
   String ReciveCount = '';
+  String ReciveTotalPrice = '';
   String imageurl = 'https://gravitinfosystems.com/MDNS/uploads/';
   final String phone = 'tel:+917000624695';
-  String status;
-  String ReciveTotalPrice = '';
-  String CardItemId  = '';
   String GlobalProductId  = '';
+  String CardItemId  = '';
   bool statusProductDeleted = false;
   int statusProductAddItem = 0;
   bool statusProductRemoveItem = false;
@@ -77,17 +76,14 @@ class _HomeTotalAddList extends State<HomeTotalAddList> {
       loading = true;
     });
     _list.clear();
-    String Url ='http://gravitinfosystems.com/MDNS/MDN_APP/CartProduct.php?id='+widget.value.toString();
+    String Url ='http://gravitinfosystems.com/MDNS/MDN_APP/MyOrder.php?UserId='+Userid;
     //print("CartProductListUrl"+Url);;
     final response =
     await http.get(Url);
     if (response.statusCode == 200) {
       final extractdata = jsonDecode(response.body);
-      //print("extractdata"+extractdata.toString());
       data = extractdata["data"];
-      //print("akash"+data.toString());
-      /*var akash = extractdata["data"]["ststus"];
-      print("akash"+akash.toString());*/
+      //print("data"+data.toString());
       setState(() {
         for (Map i in data) {
           _list.add(Posts.formJson(i));
@@ -95,6 +91,25 @@ class _HomeTotalAddList extends State<HomeTotalAddList> {
         }
       });
     }
+  }
+//---------------------------------------------------------------------------------------------------//
+  getProductCount() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Userid = prefs.getString(Preferences.KEY_ID).toString();
+    //print("Userid"+Userid);
+    String GetCount =
+        'http://gravitinfosystems.com/MDNS/MDN_APP/forcount.php?UserId='+Userid;
+    //print("GetCount " + GetCount);
+    var res =
+    await http.get(GetCount, headers: {"Accept": "application/json"});
+    var dataLogin = json.decode(res.body);
+    // print("ReciveData"+dataLogin.toString());
+    ReciveCount = dataLogin["count"].toString();
+    // print("GetCountFromServer"+ReciveCount);
+    setState(() {
+      //print("Success");
+      //print("GetCountFromServer"+Userid);
+    });
   }
 //-----------------------------------------------------------------------------------------------------//
   getTotalPrice() async {
@@ -109,26 +124,7 @@ class _HomeTotalAddList extends State<HomeTotalAddList> {
     var dataPrice = json.decode(res.body);
     // print("ReciveData"+dataLogin.toString());
     ReciveTotalPrice = dataPrice["TOTAL"].toString();
-   // print("GetCountFromServer"+ReciveTotalPrice);
-    setState(() {
-      //print("Success");
-      //print("GetCountFromServer"+Userid);
-    });
-  }
-//---------------------------------------------------------------------------------------------------//
-  getProductCount() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    Userid = prefs.getString(Preferences.KEY_ID).toString();
-    //print("Userid"+Userid);
-    String GetProductCount =
-        'http://gravitinfosystems.com/MDNS/MDN_APP/forcount.php?UserId='+Userid;
-    //print("GetCount " + GetCount);
-    var res =
-    await http.get(GetProductCount, headers: {"Accept": "application/json"});
-    var dataLogin = json.decode(res.body);
-    // print("ReciveData"+dataLogin.toString());
-    ReciveCount = dataLogin["count"].toString();
-    // print("GetCountFromServer"+ReciveCount);
+    print("GetCountFromServer"+ReciveTotalPrice);
     setState(() {
       //print("Success");
       //print("GetCountFromServer"+Userid);
@@ -141,46 +137,12 @@ class _HomeTotalAddList extends State<HomeTotalAddList> {
     //print("Userid"+Userid);
     String GetDeleteProductItem =
         'http://gravitinfosystems.com/MDNS/MDN_APP/DeleteProductFromCart.php?UserId='+Userid+"&ProductId="+GlobalProductId;
-    print("GetCount " + GetDeleteProductItem);
+    // print("GetCount " + GetDeleteProductItem);
     var res =
     await http.get(GetDeleteProductItem, headers: {"Accept": "application/json"});
     var ProductdataDelete = json.decode(res.body);
     statusProductDeleted = ProductdataDelete['status'];
     //print("status" + statusProductDeleted.toString());
-    setState(() {
-      print("Success");
-    });
-  }
-//---------------------------------------------------------------------------------------------------//
-  AddProductCount() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    Userid = prefs.getString(Preferences.KEY_ID).toString();
-    //print("Userid"+Userid);
-    String GetAddProductCount =
-        'http://gravitinfosystems.com/MDNS/MDN_APP/Cart.php?UserId='+Userid+"&ProductId="+GlobalProductId;
-    var res =
-    await http.get(GetAddProductCount, headers: {"Accept": "application/json"});
-    var dataAddItem = json.decode(res.body);
-    statusProductAddItem = dataAddItem['status'];
-    //print("status" + statusProductAddItem.toString());
-    setState(() {
-      print("Success");
-    });
-  }
-
-//---------------------------------------------------------------------------------------------------//
-  RemoveProductCount() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    Userid = prefs.getString(Preferences.KEY_ID).toString();
-    //print("Userid"+Userid);
-    String GetRemoveCount =
-        'http://gravitinfosystems.com/MDNS/MDN_APP/RemoveSingleCartItem.php?CartId='+CardItemId;
-    print("GetRemoveCount " + GetRemoveCount);
-    var res =
-    await http.get(GetRemoveCount, headers: {"Accept": "application/json"});
-    var dataRemoveItem = json.decode(res.body);
-    statusProductRemoveItem = dataRemoveItem['status'];
-    print("status" + statusProductRemoveItem.toString());
     setState(() {
       print("Success");
     });
@@ -214,7 +176,7 @@ class _HomeTotalAddList extends State<HomeTotalAddList> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => HomeTotalAddList(
+                      builder: (context) => MyOrder(
                           value: Userid.toString(),
                           value5: widget.value.toString()
                           )),
@@ -230,6 +192,22 @@ class _HomeTotalAddList extends State<HomeTotalAddList> {
           );
       },
       );
+  }
+//---------------------------------------------------------------------------------------------------//
+  AddProductCount() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Userid = prefs.getString(Preferences.KEY_ID).toString();
+    //print("Userid"+Userid);
+    String GetAddProductCount =
+        'http://gravitinfosystems.com/MDNS/MDN_APP/Cart.php?UserId='+Userid+"&ProductId="+GlobalProductId;
+    var res =
+    await http.get(GetAddProductCount, headers: {"Accept": "application/json"});
+    var dataAddItem = json.decode(res.body);
+    statusProductAddItem = dataAddItem['status'];
+    print("status" + statusProductAddItem.toString());
+    setState(() {
+      print("Success");
+    });
   }
 //--------------------------------------------------------------------------------------------------------//
   Future<void> _AddProductItemAlert() async {
@@ -260,7 +238,7 @@ class _HomeTotalAddList extends State<HomeTotalAddList> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => HomeTotalAddList(
+                      builder: (context) => MyOrder(
                           value: Userid.toString(),
                           value5: widget.value.toString()
                           )),
@@ -276,6 +254,23 @@ class _HomeTotalAddList extends State<HomeTotalAddList> {
           );
       },
       );
+  }
+//---------------------------------------------------------------------------------------------------//
+  RemoveProductCount() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Userid = prefs.getString(Preferences.KEY_ID).toString();
+    //print("Userid"+Userid);
+    String GetRemoveCount =
+        'http://gravitinfosystems.com/MDNS/MDN_APP/RemoveSingleCartItem.php?CartId='+CardItemId;
+    // print("GetRemoveCount " + GetRemoveCount);
+    var res =
+    await http.get(GetRemoveCount, headers: {"Accept": "application/json"});
+    var dataRemoveItem = json.decode(res.body);
+    statusProductRemoveItem = dataRemoveItem['status'];
+    print("status" + statusProductRemoveItem.toString());
+    setState(() {
+      print("Success");
+    });
   }
 //--------------------------------------------------------------------------------------------------------//
   Future<void> _RemoveProductItemAlert() async {
@@ -306,7 +301,7 @@ class _HomeTotalAddList extends State<HomeTotalAddList> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => HomeTotalAddList(
+                      builder: (context) => MyOrder(
                           value: Userid.toString(),
                           value5: widget.value.toString()
                           )),
@@ -356,12 +351,7 @@ class _HomeTotalAddList extends State<HomeTotalAddList> {
   }
 //---------------------------------------------------------------------------------------------------//
   Future<Null> BackScreen() async {
-   Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => HomePage(
-            )),
-      );
+    Navigator.of(context).pushNamed(HomePage.tag);
   }
 //----------------------------------------------------------------------------------------//
   _callPhone() async {
@@ -400,28 +390,23 @@ class _HomeTotalAddList extends State<HomeTotalAddList> {
                 categoryid = data[i]["categoryid"];
                 final a = _list[i];
                 GlobalProductId = a.userId.toString();
-                CardItemId = a.id.toString();
-                //print("ReciveProductID"+GlobalProductId);
-                //print("ItemId"+ItemId);
+                CardItemId = a.OrderId.toString();
                 return new Container(
                   color: Colors.white54,
                   child: new GestureDetector(
-                  /*  onTap: () {
+                    /*onTap: () {
                       setState(() {
-
-                        GlobalProductId = (data[i][
-                                        "product_id"]);
-                        //if you want to assign the index somewhere to check
-                        //print("OnTap"+GlobalProductId.toString());
+                        _id = int.parse(data[i][
+                                        "categoryid"]); //if you want to assign the index somewhere to check
+                        //print("categoryid"+_id.toString());
                       });
-                    *//*  var route = new MaterialPageRoute(
+                      var route = new MaterialPageRoute(
                         builder: (BuildContext context) =>
-                        new HomeTotalAddList(
-                            value: GlobalProductId.toString(),
-                            value2: ProductName.toString(),
+                        new SubCategoryList(
+                            value: _id.toString(),
                             value1: " ${ widget.value }"),
                         );
-                      Navigator.of(context).push(route);*//*
+                      Navigator.of(context).push(route);
                     },*/
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
@@ -432,7 +417,7 @@ class _HomeTotalAddList extends State<HomeTotalAddList> {
                             width: 80,
                             decoration: BoxDecoration(
                               image: DecorationImage(
-                                image: NetworkImage(imageurl+a.image),
+                                image: NetworkImage(imageurl+a.Payment_Image),
                                 fit: BoxFit.contain,
                                 ),
                               borderRadius: BorderRadius.all(Radius.circular(5)),
@@ -446,7 +431,7 @@ class _HomeTotalAddList extends State<HomeTotalAddList> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   Text(
-                                    a.productname,
+                                    "productname",
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontWeight: FontWeight.w600,
@@ -458,7 +443,7 @@ class _HomeTotalAddList extends State<HomeTotalAddList> {
                                     height: 10,
                                     ),
                                   Text(
-                                    "Total Add Item ${a.count}",
+                                    "Order ID ${a.OrderId}",
                                     style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 12,
@@ -472,7 +457,7 @@ class _HomeTotalAddList extends State<HomeTotalAddList> {
                                     children: <Widget>[
                                       Expanded(
                                         child: Text(
-                                          "SellingPrice ${a.SellingPrice}",
+                                          " ${a.OrderDate}",
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 12,
@@ -485,19 +470,12 @@ class _HomeTotalAddList extends State<HomeTotalAddList> {
                                         size: 18,
                                         color:Color(0xFF222B78),
                                         ),
-                                      new Text(a.Discost.toString(), style: TextStyle(
+                                      new Text(a.Amount.toString(), style: TextStyle(
                                         fontWeight: FontWeight.w600,
                                         fontSize: 18,
                                         color:Color(0xFF222B78),
                                         ),
                                                ),
-
-                                      /*new Text(a.id.toString(), style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 18,
-                                        color:Color(0xFF222B78),
-                                        ),
-                                               ),*/
                                       SizedBox(
                                         width: 5,
                                         ),
@@ -524,61 +502,30 @@ class _HomeTotalAddList extends State<HomeTotalAddList> {
                                           ),
                                         ),
 
-                                      Container(
-                                        color:Color(0xFFE0318C),
+                                      /*Container(
+                                        color:Color(0xFFEFFFFFF),
                                         child: IconButton(
-                                          icon: Icon(Icons.remove,color: Colors.white,),
-                                          onPressed: () {
-                                            setState(() {
-
-                                              CardItemId = (data[i][
-                                              "Id"]);
-                                              //if you want to assign the index somewhere to check
-                                              //print("OnTapProductId"+GlobalProductId.toString());
-                                            });
-                                            RemoveProductCount();
-                                            _RemoveProductItemAlert();
-                                            //print("hello");
-                                            // model.removeProduct(model.cart[index]);
-                                          },
+                                          icon: Icon(Icons.warning, color:Color(0xFFE0318C),),
                                           ),
-                                        ),
+                                        ),*/
                                       Container(
-                                        color:Color(0xFFE0318C),
-                                        child: IconButton(
-                                          icon: Icon(Icons.add,color: Colors.white,),
-                                          onPressed: () {
-                                            setState(() {
-
-                                              GlobalProductId = (data[i][
-                                              "product_id"]);
-                                              //if you want to assign the index somewhere to check
-                                              print("OnTapProductId"+GlobalProductId.toString());
-                                            });
-                                            AddProductCount();
-                                            _AddProductItemAlert();
-                                            //print("hello");
-                                            // model.removeProduct(model.cart[index]);
-                                          },
-                                          ),
-                                        ),
-                                      Container(
-                                        color:Color(0xFFE0318C),
-                                        child: IconButton(
-                                          icon: Icon(Icons.delete,color: Colors.white,),
-                                           onPressed: () {
-                                             setState(() {
-
-                                               GlobalProductId = (data[i][
-                                               "product_id"]);
-                                               //if you want to assign the index somewhere to check
-                                               //print("OnTapProductId"+GlobalProductId.toString());
-                                             });
-                                             DeleteProductItem();
-                                             _DeleteProductItemAlert();
-                                            //print("hello");
-                                            // model.removeProduct(model.cart[index]);
-                                          },
+                                        //color:Color(0xFFE0318C),
+                                        child: SizedBox(
+                                          width: 75.0,
+                                          child: ScaleAnimatedTextKit(
+                                           /* onTap: () {
+                                              print("Tap Event");
+                                            },*/
+                                            text: [
+                                              a.order_status.toString(),
+                                              a.order_status.toString(),
+                                            ],
+                                            textStyle: TextStyle(
+                                                fontSize: 18.0,
+                                                fontFamily: "Canterbury",
+                                                color:Color(0xFFE0318C),
+                                                ),
+                                            ),
                                           ),
                                         ),
                                       /*SizedBox(
@@ -619,7 +566,7 @@ class _HomeTotalAddList extends State<HomeTotalAddList> {
             padding: const EdgeInsets.all(10.0),
             child: new Container(
               color: Colors.transparent,
-              child: Text('add item List'.toUpperCase()),
+              child: Text('My order List'.toUpperCase()),
               ),
             ),
           centerTitle: true,
@@ -637,7 +584,7 @@ class _HomeTotalAddList extends State<HomeTotalAddList> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => HomeTotalAddList(
+                          builder: (context) => TotalAddCartList(
                             value: Userid.toString(),
                             )),
                       );
@@ -668,7 +615,7 @@ class _HomeTotalAddList extends State<HomeTotalAddList> {
           ),
         backgroundColor: Colors.white,
         body: listJson,
-        bottomNavigationBar: BottomAppBar(
+    /*    bottomNavigationBar: BottomAppBar(
           child: new Row(
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.max,
@@ -682,11 +629,11 @@ class _HomeTotalAddList extends State<HomeTotalAddList> {
                     //color: Colors.red,
                     icon: Icon(FontAwesomeIcons.rupeeSign,color: Colors.white,), //`Icon` to display
                       label: Text(ReciveTotalPrice.toString(),textAlign: TextAlign.left,style: TextStyle(fontSize: 15.0, color: Colors.white,fontWeight: FontWeight.bold,)), //`Text` to display
-                    /*onPressed: () {
+                    *//*onPressed: () {
                         Navigator
                             .of(context)
                             .push(new MaterialPageRoute(builder: (_) => new Product()));
-                      },*/
+                      },*//*
                     ),
 
                   ),
@@ -705,9 +652,9 @@ class _HomeTotalAddList extends State<HomeTotalAddList> {
                       onPressed: () {
                         var route = new MaterialPageRoute(
                           builder: (BuildContext context) =>
-                          new HomeCheckOut(
-                              value5: ReciveTotalPrice.toString(),
-                              value6: CardItemId.toString(),),
+                          new TotalCheckOut(
+                            value7: ReciveTotalPrice.toString(),
+                            value8: CardItemId.toString(),),
                           );
                         Navigator.of(context).push(route);
                       },
@@ -718,7 +665,7 @@ class _HomeTotalAddList extends State<HomeTotalAddList> {
                 ),
             ],
             ),
-          ),),
+          ),*/),
       );
   }
 //---------------------------------------------------------------------------------------------------//

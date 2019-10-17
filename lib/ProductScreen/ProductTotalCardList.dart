@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mdsons/CategoryScreen/CategoryScreenList.dart';
 import 'package:mdsons/CheckOutScreen/CheckOut.dart';
+import 'package:mdsons/MyOrderScreen/MyOrder.dart';
 import 'package:mdsons/ProductScreen/ProductCheckOut.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mdsons/HomeScreen/HomePage.dart';
@@ -794,7 +795,7 @@ class _ProductTotalCardList extends State<ProductTotalCardList> {
                 ),
               title: Text("MyOrder".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
               onTap: () {
-                //Navigator.of(context).pushNamed(CartProductList.tag);
+                Navigator.of(context).pushNamed(MyOrder.tag);
               },
               ),
             Divider(
