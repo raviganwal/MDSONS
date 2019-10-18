@@ -154,7 +154,7 @@ class _TotalCheckOutList extends State<TotalCheckOut> {
       ReciveStatus = data["msg"].toString();
       OrderNumber = data["OrderNumber"].toString();
       UploadImagestatus = data["status"];
-
+   _handleSubmitted();
         print("ReciveStatus" + ReciveStatus.toString());
       //print("OrderNumber" + OrderNumber.toString());
       //print("UploadImagestatus" + UploadImagestatus.toString());
@@ -163,19 +163,10 @@ class _TotalCheckOutList extends State<TotalCheckOut> {
     });
   }
   void _handleSubmitted() {
-
     if(UploadImagestatus == false){
       showInSnackBar(ReciveStatus);
     }else if(UploadImagestatus == true){
-     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => HomePage(
-
-            )),
-        );
-
-     showInSnackBar(OrderNumber);
+     showInSnackBar(OrderNumber);      
       }
     }
 
@@ -385,7 +376,6 @@ class _TotalCheckOutList extends State<TotalCheckOut> {
                     onPressed: () {
                      // startUpload();
                        startUpload();
-                      _handleSubmitted();
                      // showAlert(context, OrderNumber.toString());
                     //  data["msg"]
                       //print("hello");
