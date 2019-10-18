@@ -1,55 +1,92 @@
-import 'dart:io';
-import 'package:image_picker/image_picker.dart';
+import "package:flutter/material.dart";
 import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:mdsons/HomeScreen/HomePage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:mdsons/Preferences/Preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:async/async.dart';
-import 'package:path/path.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-//------------------------------------------------------------------------------------------//
+import 'package:mdsons/CategoryScreen/CategoryScreenList.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:mdsons/HomeScreen/HomePage.dart';
+import 'package:mdsons/TotalAddCartList/TotalAddCartList.dart';
+import 'package:mdsons/TotalAddCartList/TotalCartModel.dart';
+import 'package:mdsons/ProductScreen/Product.dart';
+import 'package:mdsons/ProfileDetails/Profile.dart';
+import 'package:mdsons/SplashScreen/Splash.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mdsons/Preferences/Preferences.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+//---------------------------------------------------------------------------------------------------//
 class Palette1 {
   static Color greenLandLight1 = Color(0xFF222B78);
 }
 class Palette2 {
   static Color greenLandLight2 = Color(0xFFE0318C);
 }
-//-------------------------------------------------------------------------------------------//
+//---------------------------------------------------------------------------------------------------//
 class CategoryCheckOutScreen extends StatefulWidget {
-  static String tag = 'CategoryCheckOutScreen';
-  CategoryCheckOutScreen({Key key, this.title, this.value7, this.value8}) : super(key: key);
-  final String title;
+
+  static String tag = 'TotalCheckOut';
+  final String value;
   final String value7;
   final String value8;
+
+//---------------------------------------------------------------------------------------------------//
+  CategoryCheckOutScreen({Key key, this.value, this.value7, this.value8}) : super(key: key);
   @override
-  _CategoryCheckOutScreenState createState() => new _CategoryCheckOutScreenState();
+  _CategoryCheckOutScreenList createState() => new _CategoryCheckOutScreenList();
 }
-//-------------------------------------------------------------------------------------------//
-class _CategoryCheckOutScreenState extends State<CategoryCheckOutScreen> {
-  File _image;
+//---------------------------------------------------------------------------------------------------//
+class _CategoryCheckOutScreenList extends State<CategoryCheckOutScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  void showInSnackBar(String value) {
+    _scaffoldKey.currentState.showSnackBar(SnackBar(
+      content: Text(value),
+      ));
+  }
+  static final String uploadEndPoint =
+      'http://gravitinfosystems.com/MDNS/MDN_APP/CheckoutCart.php?PaymentImage=';
+  Future<File> file;
+  String status = '';
+  String base64Image;
+  File tmpFile;
+  String errMessage = 'Error Uploading Image';
   String UserName = '';
   String UserEmail = '';
   String UserContact = '';
   String Userid = '';
-  final String phone = 'tel:+917000624695';
-  String id;
-  bool statusDataSend = false;
-  String OrderID = '';
+  String ReciveCount = '';
+  String ReciveStatus = '';
+  String OrderNumber = '';
+  String pressphone = "";
+  bool UploadImagestatus = false;
 //-------------------------------------------------------------------------------------------//
   @override
   void initState() {
     this.fetchData();
+    this.getProductCount();
     super.initState();
   }
-//-------------------------------------------------------------------------------------------//
-  @override
-  void dispose() {
-    super.dispose();
+
+//---------------------------------------------------------------------------------------------------//
+  getProductCount() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Userid = prefs.getString(Preferences.KEY_ID).toString();
+    //print("Userid"+Userid);
+    String GetCount =
+        'http://gravitinfosystems.com/MDNS/MDN_APP/forcount.php?UserId=' +
+            Userid;
+    //print("GetCount " + GetCount);
+    var res =
+    await http.get(GetCount, headers: {"Accept": "application/json"});
+    var dataLogin = json.decode(res.body);
+    // print("ReciveData"+dataLogin.toString());
+    ReciveCount = dataLogin["count"].toString();
+    // print("GetCountFromServer"+ReciveCount);
+    setState(() {
+      //print("Success");
+      //print("GetCountFromServer"+Userid);
+    });
   }
+
 //-------------------------------------------------------------------------------------------//
   Future<Null> fetchData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -59,188 +96,287 @@ class _CategoryCheckOutScreenState extends State<CategoryCheckOutScreen> {
     UserContact = prefs.getString(Preferences.KEY_Contact).toString();
     Userid = prefs.getString(Preferences.KEY_ID).toString();
   }
-//-------------------------------------------------------------------------------------------//
-  Future getImageFromCam() async { // for camera
-    var image = await ImagePicker.pickImage(source: ImageSource.camera);
+
+  chooseImage() {
     setState(() {
-      _image = image;
-      print("getImageFromCam"+_image.toString());
+      file = ImagePicker.pickImage(source: ImageSource.gallery);
+    });
+    setStatus('');
+  }
+
+  chooseCamera() {
+    setState(() {
+      file = ImagePicker.pickImage(source: ImageSource.camera);
+    });
+    setStatus('');
+  }
+
+  setStatus(String message) {
+    setState(() {
+      status = message;
     });
   }
-//-------------------------------------------------------------------------------------------//
-  Future getImageFromGallery() async {// for gallery
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      _image = image;
-      print("getImageFromGallery"+_image.toString());
+
+  startUpload() {
+    setStatus('Uploading Image...');
+    if (null == tmpFile) {
+      setStatus(errMessage);
+      return;
+    }
+    String fileName = tmpFile.path
+        .split('/')
+        .last;
+    upload(fileName);
+  }
+
+//--------------------------------------------------------------------------------//
+  upload(String fileName) {
+    http.post(uploadEndPoint, body: {
+      "image": base64Image,
+      "name": fileName,
+      "UserId": Userid,
+      "TotalAmount": widget.value7.toString(),
+    }).then((result) {
+      // print("base64Image"+base64Image.toString());
+      //print("fileName"+fileName.toString());
+      //print("uploadEndPoint"+uploadEndPoint.toString());
+      // print("uploadEndPoint"+uploadEndPoint.toString());
+      print("UserId" + Userid);
+      print("TotalAmount" + widget.value7.toString());
+      print("uploadEndPoint" + uploadEndPoint.toString());
+      print("statusCode" + result.statusCode.toString());
+      print("resultbody" + result.body);
+      // return result.body.toString();
+      setStatus(result.statusCode == 200 ? result.body : errMessage);
+
+      var data = json.decode(result.body);
+      ReciveStatus = data["msg"].toString();
+      OrderNumber = data["OrderNumber"].toString();
+      UploadImagestatus = data["status"];
+
+      print("ReciveStatus" + ReciveStatus.toString());
+      print("OrderNumber" + OrderNumber.toString());
+      print("UploadImagestatus" + UploadImagestatus.toString());
+    }).catchError((error) {
+      setStatus(error);
     });
   }
+  void _handleSubmitted() {
+    if(UploadImagestatus == true){
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => HomePage(
+            )),
+        );
+    }else{
+      showInSnackBar(ReciveStatus.toString());
+    }
+  }
+
+
+//----------------------------------------------------------------------------//
+  Widget showImage() {
+    return FutureBuilder<File>(
+      future: file,
+      builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
+        if (snapshot.connectionState == ConnectionState.done &&
+            null != snapshot.data) {
+          tmpFile = snapshot.data;
+          base64Image = base64Encode(snapshot.data.readAsBytesSync());
+          return Flexible(
+            child: Image.file(
+              snapshot.data,
+              fit: BoxFit.contain,
+              ),
+            );
+        } else if (null != snapshot.error) {
+          return const Text(
+            'Error Picking Image',
+            textAlign: TextAlign.center,
+            );
+        } else {
+          return const Text(
+            'No Image Selected',
+            textAlign: TextAlign.center,
+            );
+        }
+      },
+      );
+  }
+
 //---------------------------------------------------------------------------------------------------//
-
-  Future Upload(File imageFile) async {
-    var stream = new http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
-    var length = await imageFile.length();
-
-    var uri = Uri.parse("http://192.168.0.200/anuj/MDN/MDN_APP/CheckoutCart.php?PaymentImage=");
-    final response =
-    await http.get(uri);
-    if (response.statusCode == 200) {
-      final extractdata = jsonDecode(response.body);
-      OrderID = extractdata.toString();
-      print("OrderID"+OrderID.toString());
-    }
-    print("uri"+uri.toString());
-    var request = new http.MultipartRequest("POST", uri);
-    request.fields['UserId'] = Userid;
-    request.fields['TotalAmount'] = widget.value7.toString();
-    // print(""+ widget.value7.toString());
-    print("UserId"+request.fields['UserId'].toString());
-    print("TotalAmount"+request.fields['TotalAmount'].toString());
-    var multipartFile =  new http.MultipartFile("image", stream,length,filename: basename(imageFile.path));
-    //print("multipartFile"+multipartFile.toString());
-    request.files.add(multipartFile);
-
-    var respone = await request.send();
-    if (respone.statusCode==200) {
-      print("Image Uploaded");
-    }
-    else{
-      print("Image Failed");
-    }
-
-  }
-//----------------------------------------------------------------------------------------//
-  _callPhone() async {
-    if (await canLaunch(phone)) {
-      await launch(phone);
-    } else {
-      throw 'Could not Call Phone';
-    }
-  }
-//-------------------------------------------------------------------------------------------//
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-        //drawer: _drawer(),
-        appBar: AppBar(
-          title: Text('Upload Picture'),
-          centerTitle: true,
-          ),
-        body: ListView(
-          children: [
-            /* new SizedBox(
-              height: 2.0,
-              ),*/
-            new Card(
-              child: new Container(
-                padding: const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 15),
-                /* width: screenSize.width,*/
-                //  margin: new EdgeInsets.all(20.0),
-                child: new Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    new SizedBox(
-                      //height: 1.0,
-                      ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        new Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            new Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: <Widget>[
-                                new Text(
-                                  /*"${widget.itemRating}",*/
-                                  "total amount   ".toUpperCase(),
-                                    style: new TextStyle(fontSize: 12.0, color: Colors.black,fontWeight: FontWeight.bold),
-                                  ),
-                                Icon(FontAwesomeIcons.rupeeSign,color: Colors.black,size: 15.0,),
-                                new Text(
-                                  /*"${widget.itemRating}",*/
-                                  widget.value7.toString().toUpperCase(),
-                                    style: new TextStyle(fontSize: 12.0, color: Colors.black,fontWeight: FontWeight.bold),
-                                  ),
-
-                              ],
-                              ),
-                          ],
-                          ),
-
-                      ],
-                      ),
-                  ],
+    return Scaffold(
+      key: _scaffoldKey,
+      appBar: AppBar(
+        title: Text("Upload Picture"),
+        centerTitle: true,
+        actions: <Widget>[
+          new Stack(
+            children: <Widget>[
+              new IconButton(
+                padding: new EdgeInsets.all(15.0),
+                icon: new Icon(
+                  Icons.shopping_cart,
+                  color: Colors.white,
                   ),
+                onPressed: () {
+                  //print("hello"+id.toString());
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            TotalAddCartList(
+                              value: Userid.toString(),
+                              )),
+                    );
+                },
+                ),
+              new Positioned(
+                  child: new Stack(
+                    children: <Widget>[
+                      new Icon(null),
+                      new Positioned(
+                          top: 5.0,
+                          right: 5,
+                          child: new Center(
+                            child: new Text(
+                              ReciveCount.toString(),
+                              style: new TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12.0,
+                                  fontWeight: FontWeight.w500),
+                              ),
+                            )),
+                    ],
+                    )),
+            ],
+            ),
+
+        ],
+        ),
+      body: Container(
+        padding: EdgeInsets.all(0.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            OutlineButton(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  new Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      new Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          new Text(
+                            /*"${widget.itemRating}",*/
+                            "total amount   ".toUpperCase(),
+                              style: new TextStyle(fontSize: 12.0,
+                                                       color: Colors.black,
+                                                       fontWeight: FontWeight
+                                                           .bold),
+                            ),
+                          Icon(FontAwesomeIcons.rupeeSign, color: Colors.black,
+                                 size: 15.0,),
+                          new Text(
+                            /*"${widget.itemRating}",*/
+                            widget.value7.toString().toUpperCase(),
+                              style: new TextStyle(fontSize: 12.0,
+                                                       color: Colors.black,
+                                                       fontWeight: FontWeight
+                                                           .bold),
+                            ),
+
+                        ],
+                        ),
+                    ],
+                    ),
+
+                ],
                 ),
               ),
-            new SizedBox(
-              height: 10.0,
+            SizedBox(
+              height: 20.0,
               ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              color: Colors.grey[200],
-              height: 200.0,
-              child: Center(
-                child: _image == null
-                    ? Text('No image selected.')
-                    : Image.file(_image),
-                ),
-              ),
-            new SizedBox(
-              height: 10.0,
+            showImage(),
+            SizedBox(
+              height: 100.0,
               ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 FlatButton.icon(
-                  color:Color(0xFFE0318C),
-                  icon: Icon(FontAwesomeIcons.camera,color: Colors.white,), //`Icon` to display
-                  label: Text("Camera".toUpperCase().toString(),textAlign: TextAlign.left,style: TextStyle(fontSize: 15.0, color: Colors.white,fontWeight: FontWeight.bold,)), //`Text` to display
-                  onPressed: getImageFromCam,
+                  color: Color(0xFFE0318C),
+                  icon: Icon(FontAwesomeIcons.camera, color: Colors.white,),
+                  //`Icon` to display
+                  label: Text("Camera".toUpperCase().toString(),
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                    fontSize: 15.0,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight
+                                        .bold,)),
+                  //`Text` to display
+                  onPressed: chooseCamera,
                   ),
 
                 FlatButton.icon(
-                  color:Color(0xFFE0318C),
-                  icon: Icon( FontAwesomeIcons.cameraRetro,
-                                size: 18,
-                                color: Colors.white,), //`Icon` to display
-                  label: Text('gallery'.toUpperCase(),style: TextStyle(fontSize: 15.0, color: Colors.white,fontWeight: FontWeight.bold,)), //`Text` to display
-                  onPressed: getImageFromGallery,
+                  color: Color(0xFFE0318C),
+                  icon: Icon(FontAwesomeIcons.cameraRetro,
+                               size: 18,
+                               color: Colors.white,), //`Icon` to display
+                  label: Text('gallery'.toUpperCase(), style: TextStyle(
+                    fontSize: 15.0,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,)), //`Text` to display
+                  onPressed: chooseImage,
                   ),
               ],
               ),
+
           ],
           ),
-        bottomNavigationBar: BottomAppBar(
-          child: new Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Expanded(
-                child: Container(
-                  height: 50,
-                  color:Color(0xFF222B78),
-                  child: new FlatButton.icon(
-                    //color: Colors.red,
-                    icon: Icon(FontAwesomeIcons.paperPlane,color: Colors.white,), //`Icon` to display
-                      label: Text("send".toUpperCase().toString(),textAlign: TextAlign.left,style: TextStyle(fontSize: 15.0, color: Colors.white,fontWeight: FontWeight.bold,)), //`Text` to display
-                      onPressed: () {
-                        Upload(_image);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => HomePage()),
-                          );
-                        //print("hello");
-                        // model.removeProduct(model.cart[index]);
-                      },
-                    ),
 
+        ),
+
+      bottomNavigationBar: BottomAppBar(
+        child: new Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Expanded(
+              child: Container(
+                height: 50,
+                color: Color(0xFF222B78),
+                child: new FlatButton.icon(
+                  //color: Colors.red,
+                  icon: Icon(FontAwesomeIcons.paperPlane, color: Colors.white,),
+                    //`Icon` to display
+                    label: Text("send".toUpperCase().toString(),
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                      fontSize: 15.0,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight
+                                          .bold,)),
+                    //`Text` to display
+                    onPressed: () {
+                      startUpload();
+                      _handleSubmitted();
+                      //print("hello");
+                      // model.removeProduct(model.cart[index]);
+                    },
                   ),
-                flex: 1,
+
                 ),
-              /*Expanded(
+              flex: 1,
+              ),
+            /*Expanded(
                 child: Container(
                   height: 50,
                   color:Color(0xFFE0318C),
@@ -256,164 +392,9 @@ class _CategoryCheckOutScreenState extends State<CategoryCheckOutScreen> {
                   ),
                 flex: 3,
                 ),*/
-            ],
-            ),
-          ),
-        );
-  }
-  /*Widget _drawer() {
-    return new Drawer(
-        elevation: 20.0,
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            UserAccountsDrawerHeader(
-              accountName: Text("Mr. "+UserName.toUpperCase(),style: TextStyle(
-                  fontSize: 16.0,
-                  color: Colors.white,
-                  letterSpacing: 1.4,
-                  backgroundColor: Colors.transparent,
-                  fontWeight: FontWeight.bold),),
-              accountEmail: Text(UserEmail,style: TextStyle(
-                  fontSize: 16.0,
-                  color: Colors.white,
-                  letterSpacing: 1.4,
-                  backgroundColor: Colors.transparent,
-                  fontWeight: FontWeight.bold),),
-              currentAccountPicture:
-              CircleAvatar(
-                backgroundImage: ExactAssetImage('assets/images/aa.jpg'),
-                minRadius: 90,
-                maxRadius: 100,
-                ),
-              decoration: BoxDecoration(color: Palette2.greenLandLight2),
-              ),
-            ListTile(
-              leading: new Image.asset(
-                'assets/images/home.png',
-                width: 20.0,
-                height: 20.0,
-                fit: BoxFit.cover,
-                ),
-              title: Text("Home".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
-              onTap: () {
-                Navigator.of(context).pushNamed(HomePage.tag);
-              },
-              ),
-            Divider(
-              height: 2.0,
-              ),
-            ListTile(
-              leading: new Image.asset(
-                'assets/images/profile.png',
-                width: 20.0,
-                height: 20.0,
-                fit: BoxFit.cover,
-                ),
-              title: Text("Profile".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
-              onTap: () {
-                Navigator.of(context).pushNamed(Profile.tag);
-              },
-              ),
-            Divider(
-              height: 2.0,
-              ),
-            ListTile(
-              leading: new Image.asset(
-                'assets/images/Product.png',
-                width: 20.0,
-                height: 20.0,
-                fit: BoxFit.cover,
-                ),
-              title: Text("Products".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
-              onTap: () {
-                Navigator.of(context).pushNamed(Product.tag);
-              },
-              ),
-            Divider(
-              height: 2.0,
-              ),
-            ListTile(
-              leading: new Image.asset(
-                'assets/images/cate.png',
-                width: 20.0,
-                height: 20.0,
-                fit: BoxFit.cover,
-                ),
-              title: Text("categories".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
-              onTap: () {
-                Navigator.of(context).pushNamed(CategoryScreenList.tag);
-              },
-              ),
-            Divider(
-              height: 2.0,
-              ),
-            ListTile(
-              leading: new Image.asset(
-                'assets/images/contactus.png',
-                width: 20.0,
-                height: 20.0,
-                fit: BoxFit.cover,
-                ),
-              title: Text("MyOrder".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
-              onTap: () {
-                //Navigator.of(context).pushNamed(CartProductList.tag);
-              },
-              ),
-            Divider(
-              height: 2.0,
-              ),
-            ListTile(
-              leading: new Image.asset(
-                'assets/images/helpdesk.png',
-                width: 20.0,
-                height: 20.0,
-                fit: BoxFit.cover,
-                ),
-              title: Text("Help".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
-              onTap: () => _callPhone(),
-              ),
-            Divider(
-              height: 2.0,
-              ),
-            ListTile(
-              leading: new Image.asset(
-                'assets/images/exit.png',
-                width: 20.0,
-                height: 20.0,
-                fit: BoxFit.cover,
-                ),
-              title: Text("Logout".toUpperCase(),style: TextStyle( fontSize: 15.0, color: Colors.black,fontWeight: FontWeight.w500),),
-              onTap: () {
-                TapMessage(context, "Logout!");
-              },
-              ),
           ],
-          ));
-  }*/
-  //---------------------------------------------------------------------------------------------------//
-  void TapMessage(BuildContext context, String message) {
-    var alert = new AlertDialog(
-      title: new Text('Want to logout?'),
-      content: new Text(message),
-      actions: <Widget>[
-        new FlatButton(
-            onPressed: () {
-              removeData();
-            },
-            child: new Text('OK'))
-      ],
+          ),
+        ),
       );
-    showDialog(context: context, child: alert);
   }
-//---------------------------------------------------------------------------------------------------//
-  removeData() async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.remove(Preferences.KEY_ID);
-    prefs.remove(Preferences.KEY_ROLE);
-    prefs.remove(Preferences.KEY_NAME);
-    prefs.remove(Preferences.KEY_Email);
-    prefs.remove(Preferences.KEY_Contact);
-  }
-}
-//-------------------------------------------------------------------------------------------//
+}//---------------------------------------------------------------------------------------------------//

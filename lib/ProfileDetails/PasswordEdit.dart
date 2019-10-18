@@ -355,12 +355,12 @@ class TextFormFieldDemoState extends State<PasswordEdit> {
                     letterSpacing: 1.4,
                     backgroundColor: Colors.transparent,
                     fontWeight: FontWeight.bold),),
-                currentAccountPicture:
+                /*currentAccountPicture:
                 CircleAvatar(
                   backgroundImage: ExactAssetImage('assets/images/aa.jpg'),
                   minRadius: 90,
                   maxRadius: 100,
-                  ),
+                  ),*/
                 decoration: BoxDecoration(color: Palette.greenLandLight),
                 ),
               ListTile(

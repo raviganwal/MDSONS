@@ -58,6 +58,7 @@ class _TotalCheckOutList extends State<TotalCheckOut> {
   String OrderNumber = '';
   String pressphone = "";
   bool UploadImagestatus = false;
+  var data;
 //-------------------------------------------------------------------------------------------//
   @override
   void initState() {
@@ -149,34 +150,39 @@ class _TotalCheckOutList extends State<TotalCheckOut> {
       // return result.body.toString();
       setStatus(result.statusCode == 200 ? result.body : errMessage);
 
-      var data = json.decode(result.body);
+      data = json.decode(result.body);
       ReciveStatus = data["msg"].toString();
       OrderNumber = data["OrderNumber"].toString();
       UploadImagestatus = data["status"];
 
-      print("ReciveStatus" + ReciveStatus.toString());
-      print("OrderNumber" + OrderNumber.toString());
-      print("UploadImagestatus" + UploadImagestatus.toString());
+        print("ReciveStatus" + ReciveStatus.toString());
+      //print("OrderNumber" + OrderNumber.toString());
+      //print("UploadImagestatus" + UploadImagestatus.toString());
     }).catchError((error) {
       setStatus(error);
     });
   }
   void _handleSubmitted() {
-    if(UploadImagestatus == true){
-      Navigator.push(
+
+    if(UploadImagestatus == false){
+      showInSnackBar(ReciveStatus);
+    }else if(UploadImagestatus == true){
+     Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => HomePage(
-                )),
-        );
-    }else{
-      showInSnackBar(ReciveStatus.toString());
-    }
-    }
 
+            )),
+        );
+
+     showInSnackBar(OrderNumber);
+      }
+    }
 
 //----------------------------------------------------------------------------//
   Widget showImage() {
+    /*double width = MediaQuery.of(context).size.width;
+    double _width = width * 0.1000;*/
     return FutureBuilder<File>(
       future: file,
       builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
@@ -187,7 +193,8 @@ class _TotalCheckOutList extends State<TotalCheckOut> {
           return Flexible(
             child: Image.file(
               snapshot.data,
-              fit: BoxFit.contain,
+              height:200 ,
+              fit: BoxFit.cover,
               ),
             );
         } else if (null != snapshot.error) {
@@ -204,10 +211,10 @@ class _TotalCheckOutList extends State<TotalCheckOut> {
       },
       );
   }
-
 //---------------------------------------------------------------------------------------------------//
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -304,7 +311,7 @@ class _TotalCheckOutList extends State<TotalCheckOut> {
               ),
             showImage(),
             SizedBox(
-              height: 100.0,
+              height: 10.0,
               ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -337,6 +344,16 @@ class _TotalCheckOutList extends State<TotalCheckOut> {
                   ),
               ],
               ),
+            SizedBox(height:50.0),
+            Text(
+              ReciveStatus,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Color(0xFFE0318C),
+                fontWeight: FontWeight.w500,
+                fontSize: 20.0,
+                ),
+              ),
 
           ],
           ),
@@ -366,8 +383,11 @@ class _TotalCheckOutList extends State<TotalCheckOut> {
                                           .bold,)),
                     //`Text` to display
                     onPressed: () {
-                      startUpload();
+                     // startUpload();
+                       startUpload();
                       _handleSubmitted();
+                     // showAlert(context, OrderNumber.toString());
+                    //  data["msg"]
                       //print("hello");
                       // model.removeProduct(model.cart[index]);
                     },

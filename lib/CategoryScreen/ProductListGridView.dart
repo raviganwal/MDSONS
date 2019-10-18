@@ -122,7 +122,7 @@ class HomePageState extends State<ProductListGridView> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Userid = prefs.getString(Preferences.KEY_ID).toString();
 
-    String url = 'http://192.168.0.200/anuj/MDN/MDN_APP/ProfileDisplay.php?id='+Userid;
+    String url = 'http://gravitinfosystems.com/MDNS/MDN_APP/ProfileDisplay.php?id='+Userid;
     //print("url"+url);
     var response = await http
         .get(Uri.encodeFull(url), headers: {"Accept": "application/json"});
@@ -517,12 +517,12 @@ class HomePageState extends State<ProductListGridView> {
                   letterSpacing: 1.4,
                   backgroundColor: Colors.transparent,
                   fontWeight: FontWeight.bold),),
-              currentAccountPicture:
+              /*currentAccountPicture:
               CircleAvatar(
                 backgroundImage: ExactAssetImage('assets/images/aa.jpg'),
                 minRadius: 90,
                 maxRadius: 100,
-              ),
+              ),*/
               decoration: BoxDecoration(color: Palette.greenLandLight),
             ),
             ListTile(

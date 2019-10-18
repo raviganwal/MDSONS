@@ -12,6 +12,7 @@ import 'package:mdsons/HomeScreen/HomeProductDetails.dart';
 import 'package:mdsons/HomeScreen/HomeTotalAddList.dart';
 import 'package:mdsons/LoginScreen/Login.dart';
 import 'package:mdsons/MyOrderScreen/MyOrder.dart';
+import 'package:mdsons/MyOrderScreen/MyOrderDetails.dart';
 import 'package:mdsons/ProductScreen/DetailsOrAddToCart.dart';
 import 'package:mdsons/ProductScreen/Product.dart';
 import 'package:mdsons/ProductScreen/ProductCheckOut.dart';
@@ -46,5 +47,6 @@ final routes = {
   CategoryCheckOutScreen.tag: (context) => CategoryCheckOutScreen(),
   TotalCheckOut.tag: (context) => TotalCheckOut(),
   PasswordEdit.tag: (context) => PasswordEdit(),
-  MyOrder.tag: (context) => MyOrder()
+  MyOrder.tag: (context) => MyOrder(),
+  MyOrderDetails.tag: (context) => MyOrderDetails()
 };

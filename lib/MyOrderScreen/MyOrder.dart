@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mdsons/CategoryScreen/CategoryScreenList.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:mdsons/MyOrderScreen/MyOrderDetails.dart';
 import 'package:mdsons/TotalAddCartList/TotalAddCartList.dart';
 import 'package:mdsons/TotalAddCartList/TotalCheckOut.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -64,6 +65,7 @@ class _MyOrderList extends State<MyOrder> {
   String ProfileStatus = '';
   String ProfileUserType = '';
   String ProfileEmail = '';
+  String OrderID  = '';
 //---------------------------------------------------------------------------------------------------//
   // ignore: missing_return
   Future<Null> fetchData() async {
@@ -77,13 +79,13 @@ class _MyOrderList extends State<MyOrder> {
     });
     _list.clear();
     String Url ='http://gravitinfosystems.com/MDNS/MDN_APP/MyOrder.php?UserId='+Userid;
-    //print("CartProductListUrl"+Url);;
+    print("CartProductListUrl"+Url);;
     final response =
     await http.get(Url);
     if (response.statusCode == 200) {
       final extractdata = jsonDecode(response.body);
       data = extractdata["data"];
-      //print("data"+data.toString());
+      print("data"+data.toString());
       setState(() {
         for (Map i in data) {
           _list.add(Posts.formJson(i));
@@ -130,200 +132,12 @@ class _MyOrderList extends State<MyOrder> {
       //print("GetCountFromServer"+Userid);
     });
   }
-//---------------------------------------------------------------------------------------------------//
-  DeleteProductItem() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    Userid = prefs.getString(Preferences.KEY_ID).toString();
-    //print("Userid"+Userid);
-    String GetDeleteProductItem =
-        'http://gravitinfosystems.com/MDNS/MDN_APP/DeleteProductFromCart.php?UserId='+Userid+"&ProductId="+GlobalProductId;
-    // print("GetCount " + GetDeleteProductItem);
-    var res =
-    await http.get(GetDeleteProductItem, headers: {"Accept": "application/json"});
-    var ProductdataDelete = json.decode(res.body);
-    statusProductDeleted = ProductdataDelete['status'];
-    //print("status" + statusProductDeleted.toString());
-    setState(() {
-      print("Success");
-    });
-  }
-//--------------------------------------------------------------------------------------------------------//
-  Future<void> _DeleteProductItemAlert() async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Product Deleted.. ', textAlign: TextAlign.center,
-                        style: new TextStyle(fontSize: 15.0,
-                                                 color: Palette1.greenLandLight1,
-                                                 fontWeight: FontWeight.bold),),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('Product has been deleted from your List Thanks..',
-                       textAlign: TextAlign.center,
-                       style: new TextStyle(fontSize: 12.0,
-                                                color: Palette1.greenLandLight1,
-                                                fontWeight: FontWeight.bold),),
-              ],
-              ),
-            ),
-          actions: <Widget>[
-            FlatButton(
-              onPressed: () {
-                //("hello123"+id.toString());
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => MyOrder(
-                          value: Userid.toString(),
-                          value5: widget.value.toString()
-                          )),
-                  );
-              },
-              child: Text('OK', style: new TextStyle(fontSize: 15.0,
-                                                         color: Palette1
-                                                             .greenLandLight1,
-                                                         fontWeight: FontWeight
-                                                             .bold),),
-              )
-          ],
-          );
-      },
-      );
-  }
-//---------------------------------------------------------------------------------------------------//
-  AddProductCount() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    Userid = prefs.getString(Preferences.KEY_ID).toString();
-    //print("Userid"+Userid);
-    String GetAddProductCount =
-        'http://gravitinfosystems.com/MDNS/MDN_APP/Cart.php?UserId='+Userid+"&ProductId="+GlobalProductId;
-    var res =
-    await http.get(GetAddProductCount, headers: {"Accept": "application/json"});
-    var dataAddItem = json.decode(res.body);
-    statusProductAddItem = dataAddItem['status'];
-    print("status" + statusProductAddItem.toString());
-    setState(() {
-      print("Success");
-    });
-  }
-//--------------------------------------------------------------------------------------------------------//
-  Future<void> _AddProductItemAlert() async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Product Added.. ', textAlign: TextAlign.center,
-                        style: new TextStyle(fontSize: 15.0,
-                                                 color: Palette1.greenLandLight1,
-                                                 fontWeight: FontWeight.bold),),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('Product has been Added From Your List Thanks..',
-                       textAlign: TextAlign.center,
-                       style: new TextStyle(fontSize: 12.0,
-                                                color: Palette1.greenLandLight1,
-                                                fontWeight: FontWeight.bold),),
-              ],
-              ),
-            ),
-          actions: <Widget>[
-            FlatButton(
-              onPressed: () {
-                //("hello123"+id.toString());
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => MyOrder(
-                          value: Userid.toString(),
-                          value5: widget.value.toString()
-                          )),
-                  );
-              },
-              child: Text('OK', style: new TextStyle(fontSize: 15.0,
-                                                         color: Palette1
-                                                             .greenLandLight1,
-                                                         fontWeight: FontWeight
-                                                             .bold),),
-              )
-          ],
-          );
-      },
-      );
-  }
-//---------------------------------------------------------------------------------------------------//
-  RemoveProductCount() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    Userid = prefs.getString(Preferences.KEY_ID).toString();
-    //print("Userid"+Userid);
-    String GetRemoveCount =
-        'http://gravitinfosystems.com/MDNS/MDN_APP/RemoveSingleCartItem.php?CartId='+CardItemId;
-    // print("GetRemoveCount " + GetRemoveCount);
-    var res =
-    await http.get(GetRemoveCount, headers: {"Accept": "application/json"});
-    var dataRemoveItem = json.decode(res.body);
-    statusProductRemoveItem = dataRemoveItem['status'];
-    print("status" + statusProductRemoveItem.toString());
-    setState(() {
-      print("Success");
-    });
-  }
-//--------------------------------------------------------------------------------------------------------//
-  Future<void> _RemoveProductItemAlert() async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Product Removed.. ', textAlign: TextAlign.center,
-                        style: new TextStyle(fontSize: 15.0,
-                                                 color: Palette1.greenLandLight1,
-                                                 fontWeight: FontWeight.bold),),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('Product has been Removeded From Your List Thanks..',
-                       textAlign: TextAlign.center,
-                       style: new TextStyle(fontSize: 12.0,
-                                                color: Palette1.greenLandLight1,
-                                                fontWeight: FontWeight.bold),),
-              ],
-              ),
-            ),
-          actions: <Widget>[
-            FlatButton(
-              onPressed: () {
-                //("hello123"+id.toString());
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => MyOrder(
-                          value: Userid.toString(),
-                          value5: widget.value.toString()
-                          )),
-                  );
-              },
-              child: Text('OK', style: new TextStyle(fontSize: 15.0,
-                                                         color: Palette1
-                                                             .greenLandLight1,
-                                                         fontWeight: FontWeight
-                                                             .bold),),
-              )
-          ],
-          );
-      },
-      );
-  }
 //------------------------------------------------------------------------------------------------//
   Future<String> ProfileDisplay() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Userid = prefs.getString(Preferences.KEY_ID).toString();
 
-    String url = 'http://192.168.0.200/anuj/MDN/MDN_APP/ProfileDisplay.php?id='+Userid;
+    String url = 'http://gravitinfosystems.com/MDNS/MDN_APP/ProfileDisplay.php?id='+Userid;
     //print("url"+url);
     var response = await http
         .get(Uri.encodeFull(url), headers: {"Accept": "application/json"});
@@ -344,10 +158,10 @@ class _MyOrderList extends State<MyOrder> {
 //---------------------------------------------------------------------------------------------------//
   @override
   void initState() {
-    this.getProductCount();
+     this.getProductCount();
     this.fetchData();
     this.getTotalPrice();
-    this.ProfileDisplay();
+   this.ProfileDisplay();
   }
 //---------------------------------------------------------------------------------------------------//
   Future<Null> BackScreen() async {
@@ -380,169 +194,110 @@ class _MyOrderList extends State<MyOrder> {
             child: CircularProgressIndicator(),
             )
               : Expanded(
-            child: ListView.separated(
+            child: ListView.builder(
+
               padding: const EdgeInsets.all(4.0),
               //crossAxisSpacing: 10,
               itemCount: _list.length,
-              separatorBuilder: (context, index) =>
-                  Divider(height: 1.0, color: Colors.grey),
               itemBuilder: (context, i) {
                 categoryid = data[i]["categoryid"];
                 final a = _list[i];
-                GlobalProductId = a.userId.toString();
-                CardItemId = a.OrderId.toString();
+                OrderID = a.OrderId.toString();
+                //print("OrderID"+OrderID);
                 return new Container(
-                  color: Colors.white54,
                   child: new GestureDetector(
-                    /*onTap: () {
+                    onTap: () {
                       setState(() {
                         _id = int.parse(data[i][
-                                        "categoryid"]); //if you want to assign the index somewhere to check
-                        //print("categoryid"+_id.toString());
+                                        "OrderId"]); //if you want to assign the index somewhere to check
+                        // print("categoryid"+_id.toString());
                       });
+                      print("OrderID"+_id.toString());
                       var route = new MaterialPageRoute(
                         builder: (BuildContext context) =>
-                        new SubCategoryList(
+                        new MyOrderDetails(
                             value: _id.toString(),
-                            value1: " ${ widget.value }"),
+                            value1: " ${ widget.value }",
+                           // value2: a.productName.toString(),
+                            ),
+
                         );
                       Navigator.of(context).push(route);
-                    },*/
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
+                    },
+                    child: new Card(
+                      color: Colors.white,
+                      child: new Column(
                         children: <Widget>[
-                          Container(
-                            height: 100,
-                            width: 80,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: NetworkImage(imageurl+a.Payment_Image),
-                                fit: BoxFit.contain,
-                                ),
-                              borderRadius: BorderRadius.all(Radius.circular(5)),
-                              ),
-                            ),
-                          Expanded(
-                            child: Container(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          new ListTile(
+                           /* leading: Image.asset(
+                              'assets/images/AllCategory.png',
+                              height: 250.0,
+                              width: 50.0,
+                              ),*/
+
+                            title: new Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
-                                  Text(
-                                    "productname",
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14,
-                                      color:Color(0xFF222B78),
-                                      ),
-                                    ),
-                                  SizedBox(
-                                    height: 10,
-                                    ),
-                                  Text(
-                                    "Order ID ${a.OrderId}",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 12,
-                                      color:Color(0xFF222B78),
-                                      ),
-                                    ),
-                                  SizedBox(
-                                    height: 5,
-                                    ),
-                                  Row(
+                                  new Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
                                     children: <Widget>[
-                                      Expanded(
-                                        child: Text(
-                                          " ${a.OrderDate}",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 12,
-                                            color:Color(0xFF222B78),
-                                            ),
-                                          ),
+                                      new SizedBox(
+                                        height: 5.0,
                                         ),
-                                      Icon(
-                                        FontAwesomeIcons.rupeeSign,
-                                        size: 18,
-                                        color:Color(0xFF222B78),
-                                        ),
-                                      new Text(a.Amount.toString(), style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 18,
-                                        color:Color(0xFF222B78),
-                                        ),
-                                               ),
-                                      SizedBox(
-                                        width: 5,
-                                        ),
-                                      /*Icon(
-                                        FontAwesomeIcons.trash,
-                                        size: 18,
-                                        color:Color(0xFFE0318C),
-                                        ),*/
-                                    ],
-                                    ),
-                                  SizedBox(
-                                    height: 5,
-                                    ),
-                                  Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: Text(
-                                          "",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 12,
-                                            color:Color(0xFF222B78),
-                                            ),
-                                          ),
+                                      new Text(
+                                        /*"${widget.itemRating}",*/
+                                        "OrderID "+ a.OrderId.toString().toUpperCase(),
+                                          style: new TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold,color: Palette1.greenLandLight1,),
                                         ),
 
-                                      /*Container(
-                                        color:Color(0xFFEFFFFFF),
-                                        child: IconButton(
-                                          icon: Icon(Icons.warning, color:Color(0xFFE0318C),),
-                                          ),
-                                        ),*/
-                                      Container(
-                                        //color:Color(0xFFE0318C),
-                                        child: SizedBox(
-                                          width: 75.0,
-                                          child: ScaleAnimatedTextKit(
-                                           /* onTap: () {
-                                              print("Tap Event");
-                                            },*/
-                                            text: [
-                                              a.order_status.toString(),
-                                              a.order_status.toString(),
-                                            ],
-                                            textStyle: TextStyle(
-                                                fontSize: 18.0,
-                                                fontFamily: "Canterbury",
-                                                color:Color(0xFFE0318C),
-                                                ),
-                                            ),
-                                          ),
-                                        ),
-                                      /*SizedBox(
-                                        width: 5,
-                                        ),*/
-                                      /*Icon(
-                                        FontAwesomeIcons.trash,
-                                        size: 18,
-                                        color:Color(0xFFE0318C),
-                                        ),*/
                                     ],
                                     ),
+                                  new SizedBox(
+                                    height: 5.0,
+                                    ),
+
+                                ]),
+
+                           trailing: Icon(Icons.keyboard_arrow_right,color: Palette1.greenLandLight1,),
+
+
+                            subtitle: new Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              new Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  new SizedBox(
+                                    height: 5.0,
+                                    ),
+                                  new Text(
+                                    /*"${widget.itemRating}",*/
+                                   "OrderDate "+ a.OrderDate.toString().toUpperCase(),
+                                      style: new TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold,color: Palette1.greenLandLight1,),
+                                    ),
+
                                 ],
                                 ),
-                              ),
-                            ),
+                              new SizedBox(
+                                height: 10.0,
+                                ),
+                              new Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Icon(FontAwesomeIcons.rupeeSign, color: Palette1.greenLandLight1,
+                                         size: 15.0,),
+                                  new Text(
+                                    /*"${widget.itemRating}",*/
+                                    a.Amount.toString().toUpperCase(),
+                                      style: new TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold,color: Palette1.greenLandLight1,),
+                                    ),
 
+                                ],
+                                ),
+                            ]),
+                            ),
                         ],
                         ),
                       ),
@@ -688,12 +443,12 @@ class _MyOrderList extends State<MyOrder> {
                   letterSpacing: 1.4,
                   backgroundColor: Colors.transparent,
                   fontWeight: FontWeight.bold),),
-              currentAccountPicture:
+              /*currentAccountPicture:
               CircleAvatar(
                 backgroundImage: ExactAssetImage('assets/images/aa.jpg'),
                 minRadius: 90,
                 maxRadius: 100,
-                ),
+                ),*/
               decoration: BoxDecoration(color: Palette2.greenLandLight2),
               ),
             ListTile(

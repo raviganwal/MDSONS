@@ -117,7 +117,7 @@ class _HomePageState extends State<HomePage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Userid = prefs.getString(Preferences.KEY_ID).toString();
 
-    String url = 'http://192.168.0.200/anuj/MDN/MDN_APP/ProfileDisplay.php?id='+Userid;
+    String url = 'http://gravitinfosystems.com/MDNS/MDN_APP/ProfileDisplay.php?id='+Userid;
     //print("url"+url);
     var response = await http
         .get(Uri.encodeFull(url), headers: {"Accept": "application/json"});
@@ -130,7 +130,7 @@ class _HomePageState extends State<HomePage> {
       ProfileMobile = extractdata["data"]["contact"].toString();
       ProfileAddress = extractdata["data"]["address"].toString();
       ProfileEmail = extractdata["data"]["Email"].toString();
-      //print("ProfileName"+ProfileName.toString());
+      print("ProfileName"+ProfileName.toString());
       //print("ProfileMobile"+ProfileMobile.toString());
       // print("ProfileAddress"+ProfileAddress.toString());
     });
@@ -291,6 +291,7 @@ class _HomePageState extends State<HomePage> {
                                     children: <Widget>[
                                       Text(
                                         a.title.toUpperCase().substring(0,4),textAlign: TextAlign.center,
+                                        overflow: TextOverflow.ellipsis,
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
                                         style: TextStyle(
@@ -526,12 +527,12 @@ class _HomePageState extends State<HomePage> {
                   letterSpacing: 1.4,
                   backgroundColor: Colors.transparent,
                   fontWeight: FontWeight.bold),),
-              currentAccountPicture:
+            /*  currentAccountPicture:
               CircleAvatar(
                 backgroundImage: ExactAssetImage('assets/images/aa.jpg'),
                 minRadius: 90,
                 maxRadius: 100,
-              ),
+              ),*/
               decoration: BoxDecoration(color: Palette.greenLandLight),
             ),
             ListTile(
